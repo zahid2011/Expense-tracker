@@ -2,23 +2,24 @@ import React, { useEffect } from "react";
 import axios from "axios";
 
 const ExpenseList = ({ expenses, setExpenses }) => {
-  // Fetch expenses when the component loads
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/expenses");
+        // Get the logged-in user from localStorage
+        const user = JSON.parse(localStorage.getItem("user"));
+        // Include the user ID in the API call
+        const response = await axios.get(`http://localhost:5000/expenses/${user.id}`);
         setExpenses(response.data);
       } catch (error) {
         alert("Error fetching expenses: " + error.message);
       }
     };
-
     fetchExpenses();
-  }, [setExpenses]); // Dependency ensures it runs only on mount
+  }, [setExpenses]);
 
   return (
     <div>
-      <h2>Expense List</h2>
+      <h2 className="text-2xl font-bold mb-4">Expense List</h2>
       <ul>
         {expenses.map((expense) => (
           <li key={expense.id}>

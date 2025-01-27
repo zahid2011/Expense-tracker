@@ -5,59 +5,86 @@ const ExpenseForm = ({ setExpenses }) => {
   const [formData, setFormData] = useState({
     description: "",
     amount: "",
-    date: "",
+    date: new Date().toISOString().split('T')[0], // Default to today's date
     category: "",
-    userId: 1, // Replace with actual userId
   });
+
+  const fetchExpenses = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const response = await axios.get(`http://localhost:5000/expenses/${user.id}`);
+      setExpenses(response.data);
+    } catch (error) {
+      alert("Error fetching expenses: " + error.message);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:5000/expenses", {
+      const user = JSON.parse(localStorage.getItem("user"));
+      await axios.post("http://localhost:5000/expenses", {
         ...formData,
-        amount: parseFloat(formData.amount),
-        date: new Date(formData.date).toISOString(),
+        amount: parseFloat(formData.amount), // Convert to number
+        userId: user.id, // Include the user ID
+        date: new Date(formData.date).toISOString() // Ensure proper date format
       });
-      alert("Expense created: " + response.data.description);
-
-      // Fetch updated list of expenses after adding the new one
-      const updatedExpenses = await axios.get("http://localhost:5000/expenses");
-      setExpenses(updatedExpenses.data); // Update the state with the new list
+      fetchExpenses();
+      // Reset form after submission
+      setFormData({
+        description: "",
+        amount: "",
+        date: new Date().toISOString().split('T')[0],
+        category: ""
+      });
     } catch (error) {
-      alert("Error creating expense: " + error.response.data.error);
+      alert("Error adding expense: " + 
+        (error.response?.data?.error || error.message));
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Add Expense</h2>
+    <form onSubmit={handleSubmit} className="mb-4">
+      <h2 className="text-2xl font-bold mb-4">Add Expense</h2>
       <input
         type="text"
         placeholder="Description"
         value={formData.description}
         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+        className="border p-2 rounded mb-2 w-full"
+        required
       />
       <input
         type="number"
+        step="0.01"
         placeholder="Amount"
         value={formData.amount}
         onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+        className="border p-2 rounded mb-2 w-full"
+        required
       />
       <input
         type="date"
-        placeholder="Date"
         value={formData.date}
         onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+        className="border p-2 rounded mb-2 w-full"
+        required
       />
       <input
         type="text"
         placeholder="Category"
         value={formData.category}
         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+        className="border p-2 rounded mb-2 w-full"
+        required
       />
-      <button type="submit">Add Expense</button>
+      <button
+        type="submit"
+        className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+      >
+        Add Expense
+      </button>
     </form>
   );
 };
-
 export default ExpenseForm;

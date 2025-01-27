@@ -26,6 +26,31 @@ app.post("/users", async (req, res) => {
   }
 });
 
+// Login Endpoint
+app.post("/expenses", async (req, res) => {
+  const { description, amount, date, category, userId } = req.body;
+
+  // Validate required fields
+  if (!description || !amount || !date || !category || !userId) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  // Convert data types
+  try {
+    const newExpense = await prisma.expense.create({
+      data: {
+        description,
+        amount: parseFloat(amount), // Ensure amount is a number
+        date: new Date(date), // Convert to Date object
+        category,
+        userId: parseInt(userId) // Ensure userId is an integer
+      }
+    });
+    res.json(newExpense);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
 // Create an Expense
 app.post("/expenses", async (req, res) => {
   const { description, amount, date, category, userId } = req.body;
@@ -39,11 +64,28 @@ app.post("/expenses", async (req, res) => {
   }
 });
 
-// Fetch All Expenses
 app.get("/expenses", async (req, res) => {
-  const expenses = await prisma.expense.findMany();
-  res.json(expenses);
+  try {
+    const expenses = await prisma.expense.findMany();
+    res.json(expenses);
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
+
+app.get("/expenses/:userId", async (req, res) => {
+  const { userId } = req.params; // Get userId from route params
+  try {
+    const expenses = await prisma.expense.findMany({
+      where: { userId: parseInt(userId) }, // Ensure userId matches the logged-in user
+    });
+    res.json(expenses); // Return the fetched expenses
+  } catch (error) {
+    console.error("Error fetching expenses:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 
 // Start the server
 app.listen(5000, () => {
