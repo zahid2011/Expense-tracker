@@ -14,7 +14,20 @@ model Expense {
   date        DateTime
   category    String
   userId      Int
-  user        User     @relation("UserExpenses", fields: [userId], references: [id])
+  budgetId    Int
+  user        User     @relation("UserExpenses", fields: [userId], references: [id]) // Relation to User
+  budget      Budget   @relation("BudgetExpenses", fields: [budgetId], references: [id]) // Relation to Budget
+}
+
+model Budget {
+  id        Int       @id @default(autoincrement())
+  name      String
+  amount    Float
+  emoji     String    @default("💰")
+  userId    Int
+  user      User      @relation("UserBudgets", fields: [userId], references: [id]) // Relation to User
+  createdAt DateTime  @default(now())
+  expenses  Expense[] @relation("BudgetExpenses") // Relation to Expenses
 }
 
 model User {
@@ -22,5 +35,6 @@ model User {
   name     String
   email    String    @unique
   password String
-  expenses Expense[] @relation("UserExpenses")
+  expenses Expense[] @relation("UserExpenses") // Relation to Expenses
+  budgets  Budget[]  @relation("UserBudgets") // Relation to Budgets
 }

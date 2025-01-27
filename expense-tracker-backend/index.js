@@ -13,6 +13,20 @@ app.get("/", (req, res) => {
   res.send("Expense Tracker Backend is Running!");
 });
 
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user || user.password !== password) {
+      return res.status(401).json({ error: "Invalid email or password" });
+    }
+    res.json(user); // Send user details back to the client
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
 // Create a User
 app.post("/users", async (req, res) => {
   const { name, email, password } = req.body;
@@ -83,6 +97,42 @@ app.get("/expenses/:userId", async (req, res) => {
   } catch (error) {
     console.error("Error fetching expenses:", error);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.post("/budgets", async (req, res) => {
+  const { name, amount, emoji, userId } = req.body;
+
+  if (!name || !amount || !userId) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  try {
+    const newBudget = await prisma.budget.create({
+      data: {
+        name,
+        amount: parseFloat(amount),
+        emoji: emoji || "💰", // Default emoji
+        userId: parseInt(userId),
+      },
+    });
+    res.json(newBudget);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get Budgets for a User
+app.get("/budgets/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const budgets = await prisma.budget.findMany({
+      where: { userId: parseInt(userId) },
+    });
+    res.json(budgets);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 

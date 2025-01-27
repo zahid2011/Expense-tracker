@@ -1,39 +1,65 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Custom styles for the layout */
-#root {
-  height: 100vh;
-  display: flex;
-}
-
-.main-content {
-  margin-left: 16rem; /* Match sidebar width */
-  flex-grow: 1;
-  padding: 2rem;
-  overflow-y: auto;
-  border-left: 1px solid #e5e7eb; /* Add vertical line */
-}
-
+/* Sidebar styles */
 .sidebar {
-  width: 16rem;
+  width: 185px; /* Matches the margin-left of .main-content */
   height: 100vh;
   position: fixed;
   top: 0;
   left: 0;
-  overflow-y: auto;
-  background-color: #1f2937; /* Dark background */
+  background-color: #1f2937;
   color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Ensures the logout button stays at the bottom */
+  padding: 15px;
+  box-sizing: border-box;
 }
 
-/* Sidebar-specific styles */
-.sidebar {
-    background-color: #1f2937; /* Dark background */
-    color: white;
-  }
-  
-  .sidebar nav a:hover {
-    background-color: #374151; /* Slightly lighter on hover */
-  }
-  
+.sidebar h2 {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.sidebar nav a {
+  display: block;
+  padding: 8px 10px;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.sidebar nav a:hover {
+  background-color: #374151;
+}
+
+/* Ensure the Logout button stays visible */
+.sidebar button {
+  background-color: #dc2626;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  position: absolute; /* Ensures the button is positioned correctly */
+  bottom: 15px; /* Positions the button at the bottom of the sidebar */
+  left: 15px; /* Aligns it with the sidebar's padding */
+  width: calc(100% - 30px); /* Ensures the button stays within the sidebar */
+}
+
+.sidebar button:hover {
+  background-color: #b91c1c;
+}
+
+/* Main content styles */
+.main-content {
+  margin-left: 170px; /* Matches the sidebar width */
+  padding: 20px;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  font-family: Arial, sans-serif;
+}

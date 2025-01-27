@@ -8,6 +8,7 @@ import ExpensesPage from "./components/ExpensesPage";
 import SettingsPage from "./components/SettingsPage";
 import ProtectedLayout from "./components/ProtectedLayout";
 import Sidebar from "./components/Sidebar";
+import BudgetDetailsPage from "./components/BudgetDetailsPage"; // Import BudgetDetailsPage
 
 const App = () => {
   return (
@@ -15,11 +16,11 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<UserForm />} />
-        
+
         {/* Protected routes with sidebar */}
         <Route element={<ProtectedLayout />}>
-          <Route 
-            path="/dashboard" 
+          <Route
+            path="/dashboard"
             element={
               <div className="flex">
                 <Sidebar />
@@ -27,10 +28,10 @@ const App = () => {
                   <Dashboard />
                 </div>
               </div>
-            } 
+            }
           />
-          <Route 
-            path="/budget" 
+          <Route
+            path="/budget"
             element={
               <div className="flex">
                 <Sidebar />
@@ -38,10 +39,21 @@ const App = () => {
                   <BudgetPage />
                 </div>
               </div>
-            } 
+            }
           />
-          <Route 
-            path="/expenses" 
+          <Route
+            path="/budget/:id" // Add the route for Budget Details Page
+            element={
+              <div className="flex">
+                <Sidebar />
+                <div className="main-content">
+                  <BudgetDetailsPage />
+                </div>
+              </div>
+            }
+          />
+          <Route
+            path="/expenses"
             element={
               <div className="flex">
                 <Sidebar />
@@ -49,10 +61,10 @@ const App = () => {
                   <ExpensesPage />
                 </div>
               </div>
-            } 
+            }
           />
-          <Route 
-            path="/settings" 
+          <Route
+            path="/settings"
             element={
               <div className="flex">
                 <Sidebar />
@@ -60,7 +72,7 @@ const App = () => {
                   <SettingsPage />
                 </div>
               </div>
-            } 
+            }
           />
         </Route>
       </Routes>
