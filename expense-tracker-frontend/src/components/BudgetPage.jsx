@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import CreateBudgetDialog from "./CreateBudgetDialog";
 import "./budgetpage.css";
@@ -7,7 +7,7 @@ import "./budgetpage.css";
 const BudgetPage = () => {
   const [budgets, setBudgets] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const navigate = useNavigate(); // Initialize navigate
+  const navigate = useNavigate();
 
   const fetchBudgets = async () => {
     try {
@@ -21,32 +21,56 @@ const BudgetPage = () => {
 
   useEffect(() => {
     fetchBudgets();
-  }, []);
+  }, []); // Fetch budgets when the component is mounted
 
   const handleBudgetClick = (budgetId) => {
-    navigate(`/budget/${budgetId}`); // Navigate to the Budget Details Page
+    navigate(`/budget/${budgetId}`);
   };
 
   return (
     <div className="budget-container">
       <h1 className="budget-header">My Budgets</h1>
       <div className="budget-grid">
-        {/* Create New Budget Card */}
-        <div className="create-budget-button" onClick={() => setIsDialogOpen(true)}>
-          + Create New Budget
-        </div>
-        {/* Budget Cards */}
-        {budgets.map((budget) => (
-          <div
-            key={budget.id}
-            className="budget-card"
-            onClick={() => handleBudgetClick(budget.id)} // Handle click on budget card
-          >
-            <div className="budget-emoji">{budget.emoji}</div>
-            <div className="budget-name">{budget.name}</div>
-            <div className="budget-amount">${budget.amount.toFixed(2)}</div>
+        <div className="create-budget-card" onClick={() => setIsDialogOpen(true)}>
+          <div className="create-budget-content">
+            <span className="create-budget-icon">+</span>
+            <p className="create-budget-text">Create New Budget</p>
+            <p className="create-budget-subtext">Add a new budget to track your expenses</p>
           </div>
-        ))}
+        </div>
+
+        {budgets.map((budget) => {
+          const expenses = budget.expenses || [];
+          const totalSpent = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+          const remainingBudget = budget.amount - totalSpent;
+
+          return (
+            <div
+              key={budget.id}
+              className="budget-card"
+              onClick={() => handleBudgetClick(budget.id)}
+            >
+              <div className="budget-header-content">
+                <span className="budget-emoji">{budget.emoji}</span>
+                <span className="budget-name">{budget.name}</span>
+                <span className="budget-amount">${budget.amount.toFixed(2)}</span>
+              </div>
+              <div className="progress-bar-container">
+                <div
+                  className="progress-bar"
+                  style={{
+                    width: `${(totalSpent / budget.amount) * 100}%`,
+                    backgroundColor: "#1f1f1f",
+                  }}
+                ></div>
+              </div>
+              <div className="budget-footer">
+                <p className="budget-spent">Spent: ${totalSpent.toFixed(2)}</p>
+                <p className="budget-remaining">Remaining: ${remainingBudget.toFixed(2)}</p>
+              </div>
+            </div>
+          );
+        })}
       </div>
       {isDialogOpen && (
         <CreateBudgetDialog onClose={() => setIsDialogOpen(false)} fetchBudgets={fetchBudgets} />

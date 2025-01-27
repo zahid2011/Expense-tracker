@@ -129,6 +129,7 @@ app.get("/budgets/:userId", async (req, res) => {
   try {
     const budgets = await prisma.budget.findMany({
       where: { userId: parseInt(userId) },
+      include: { expenses: true }, // Include expenses in the response
     });
     res.json(budgets);
   } catch (error) {
@@ -136,6 +137,41 @@ app.get("/budgets/:userId", async (req, res) => {
   }
 });
 
+
+app.get("/budget/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const budget = await prisma.budget.findUnique({
+      where: { id: parseInt(id) },
+      include: { expenses: true }, // Include associated expenses
+    });
+    res.json(budget);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch budget details" });
+  }
+});
+
+// Add an expense to a budget
+app.post("/budget/:id/expense", async (req, res) => {
+  const { id } = req.params;
+  const { description, amount, date, category, userId } = req.body;
+
+  try {
+    const newExpense = await prisma.expense.create({
+      data: {
+        description,
+        amount: parseFloat(amount),
+        date: new Date(date),
+        category,
+        budgetId: parseInt(id), // Link to the budget
+        userId, // Link to the user
+      },
+    });
+    res.json(newExpense);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to add expense" });
+  }
+});
 
 // Start the server
 app.listen(5000, () => {

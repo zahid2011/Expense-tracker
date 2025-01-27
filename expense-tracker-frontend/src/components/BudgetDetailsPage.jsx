@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./BudgetDetailsPage.css";
 
-const BudgetDetailsPage = ({ match }) => {
+const BudgetDetailsPage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate(); // For back navigation
   const [budget, setBudget] = useState(null);
   const [expenses, setExpenses] = useState([]);
   const [formData, setFormData] = useState({
@@ -14,7 +17,7 @@ const BudgetDetailsPage = ({ match }) => {
 
   const fetchBudgetDetails = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/budget/${match.params.id}`);
+      const response = await axios.get(`http://localhost:5000/budget/${id}`);
       setBudget(response.data);
       setExpenses(response.data.expenses);
     } catch (error) {
@@ -31,7 +34,7 @@ const BudgetDetailsPage = ({ match }) => {
         amount: parseFloat(formData.amount),
         userId: user.id,
       });
-      fetchBudgetDetails(); // Refresh after adding an expense
+      fetchBudgetDetails();
       setFormData({
         description: "",
         amount: "",
@@ -54,66 +57,122 @@ const BudgetDetailsPage = ({ match }) => {
 
   return (
     <div className="budget-details-container">
-      <h1 className="budget-title">
-        {budget.emoji} {budget.name}
-      </h1>
-      <div className="budget-info">
-        <p>Total Budget: ${budget.amount.toFixed(2)}</p>
-        <p>Total Spent: ${totalSpent.toFixed(2)}</p>
-        <p>Remaining Budget: ${remainingBudget.toFixed(2)}</p>
+      {/* Back Button */}
+      <div className="back-button-container">
+        <button className="back-button" onClick={() => navigate(-1)}>
+          &larr; Back
+        </button>
+      </div>
+
+      {/* Budget Header */}
+      <div className="budget-header">
+        <h1>
+          {budget.emoji} {budget.name}
+        </h1>
+        <button
+          className="add-transaction-btn"
+          onClick={() =>
+            document.getElementById("add-transaction-form").scrollIntoView()
+          }
+        >
+          Add Transaction
+        </button>
+      </div>
+
+      {/* Budget Stats */}
+      <div className="budget-stats">
+        <div className="stat-card">
+          <p>Monthly Budget</p>
+          <h3>${budget.amount.toFixed(2)}</h3>
+        </div>
+        <div className="stat-card spent">
+          <p>Spent</p>
+          <h3>${totalSpent.toFixed(2)}</h3>
+        </div>
+        <div className="stat-card remaining">
+          <p>Remaining</p>
+          <h3>${remainingBudget.toFixed(2)}</h3>
+        </div>
+      </div>
+
+      {/* Monthly Progress */}
+      <div className="progress-card">
+        <h2>Monthly Progress</h2>
+        <p>
+          ${totalSpent.toFixed(2)} spent of ${budget.amount.toFixed(2)} budget
+        </p>
         <div className="progress-bar-container">
           <div
             className="progress-bar"
             style={{
               width: `${(totalSpent / budget.amount) * 100}%`,
-              backgroundColor: totalSpent > budget.amount ? "red" : "green",
             }}
           ></div>
         </div>
       </div>
 
-      {/* Add Expense Form */}
-      <h2>Add Expense</h2>
-      <form onSubmit={handleAddExpense} className="expense-form">
-        <input
-          type="text"
-          placeholder="Description"
-          value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          required
-        />
-        <input
-          type="number"
-          placeholder="Amount"
-          value={formData.amount}
-          onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-          required
-        />
-        <input
-          type="date"
-          value={formData.date}
-          onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Category"
-          value={formData.category}
-          onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-          required
-        />
-        <button type="submit">Add Expense</button>
-      </form>
+      {/* Recent Transactions */}
+      <div className="transactions-card">
+        <h2>Recent Transactions</h2>
+        {expenses
+          .slice(0)
+          .reverse()
+          .map((expense) => (
+            <div key={expense.id} className="transaction-item">
+              <div>
+                <h3>{expense.description}</h3>
+                <p>
+                  {expense.category} |{" "}
+                  {new Date(expense.date).toLocaleDateString()}
+                </p>
+              </div>
+              <h3 className="expense-amount">${expense.amount.toFixed(2)}</h3>
+            </div>
+          ))}
+      </div>
 
-      {/* Expense List */}
-      <h2>Expenses</h2>
-      <ul>
-        {expenses.map((expense) => (
-          <li key={expense.id}>
-            {expense.description} - ${expense.amount.toFixed(2)} ({expense.category})
-          </li>
-        ))}
-      </ul>
+      {/* Add Transaction Form */}
+      <div id="add-transaction-form" className="add-transaction-card">
+        <h2>Add Transaction</h2>
+        <form onSubmit={handleAddExpense}>
+          <input
+            type="text"
+            placeholder="Description"
+            value={formData.description}
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
+            required
+          />
+          <input
+            type="number"
+            placeholder="Amount"
+            value={formData.amount}
+            onChange={(e) =>
+              setFormData({ ...formData, amount: e.target.value })
+            }
+            required
+          />
+          <input
+            type="date"
+            value={formData.date}
+            onChange={(e) =>
+              setFormData({ ...formData, date: e.target.value })
+            }
+            required
+          />
+          <input
+            type="text"
+            placeholder="Category"
+            value={formData.category}
+            onChange={(e) =>
+              setFormData({ ...formData, category: e.target.value })
+            }
+            required
+          />
+          <button type="submit">Submit</button>
+        </form>
+      </div>
     </div>
   );
 };
