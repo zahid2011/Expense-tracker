@@ -20,7 +20,7 @@
     background-color: #090909;
     color: white;
     border: none;
-    border-radius: 20px;
+    border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
@@ -66,7 +66,7 @@
 .progress-card {
     margin-bottom: 30px;
     background-color: #f8f9fa;
-    border: 1px solid #ddd;
+    border: 1.5px solid #000000;
     padding: 20px;
     border-radius: 10px;
 }
@@ -144,32 +144,48 @@
     font-weight: bold;
     text-align: right;
 }
-
 .add-transaction-card input {
     display: block;
     width: 100%;
-    margin-bottom: 10px;
-    padding: 10px;
-    font-size: 14px;
-    height: 30px;
+    margin-bottom: 16px; /* Increase space between inputs */
+    padding: 14px; /* Add more padding for better touch targets */
+    font-size: 16px; /* Slightly larger text */
     border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
+    border-radius: 6px; /* More rounded corners for modern look */
+    box-sizing: border-box; /* Ensure padding doesn't affect width */
+}
+
+.add-transaction-card input:focus {
+    outline: none;
+    border-color: #3b82f6; /* Add focus color */
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); /* Add focus shadow */
 }
 
 .add-transaction-card button {
     width: 100%;
-    padding: 15px 30px;
-    background-color: #0c0c0c;
+    padding: 16px 20px; /* Adjust padding for better button size */
+    background-color: #000000;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px; /* Rounded corners */
     cursor: pointer;
+    font-size: 16px; /* Slightly larger font for visibility */
+    font-weight: bold;
 }
 
 .add-transaction-card button:hover {
-    background-color: #131414;
+    background-color: #1a1a1a; /* Slightly lighter hover effect */
 }
+
+.add-transaction-card {
+    background-color: #ffffff; /* White background for contrast */
+    padding: 24px; /* Increase padding inside card */
+    border-radius: 12px; /* More rounded corners */
+    margin-bottom: 32px; /* Spacing below card */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+    border: 1px solid #e5e7eb; /* Light border */
+}
+
 
 .back-button-container {
     margin-bottom: 20px;

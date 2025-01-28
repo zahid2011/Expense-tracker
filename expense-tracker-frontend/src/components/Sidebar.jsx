@@ -1,14 +1,17 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaChartBar, FaPiggyBank, FaFileInvoiceDollar, FaCog } from "react-icons/fa";
 
 export default function Sidebar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const user = JSON.parse(localStorage.getItem("user"));
 
   const handleLogout = () => {
     localStorage.removeItem("user");
     navigate("/");
   };
+
+  const isActive = (path) => location.pathname === path;
 
   return (
     <div className="sidebar">
@@ -27,16 +30,28 @@ export default function Sidebar() {
 
       {/* Navigation Links */}
       <nav className="nav-links">
-        <Link to="/dashboard" className="nav-link">
+        <Link
+          to="/dashboard"
+          className={`nav-link ${isActive("/dashboard") ? "active" : ""}`}
+        >
           <FaChartBar className="nav-icon" /> Dashboard
         </Link>
-        <Link to="/budget" className="nav-link">
+        <Link
+          to="/budget"
+          className={`nav-link ${isActive("/budget") ? "active" : ""}`}
+        >
           <FaPiggyBank className="nav-icon" /> Budgets
         </Link>
-        <Link to="/expenses" className="nav-link">
+        <Link
+          to="/expenses"
+          className={`nav-link ${isActive("/expenses") ? "active" : ""}`}
+        >
           <FaFileInvoiceDollar className="nav-icon" /> Expenses
         </Link>
-        <Link to="/settings" className="nav-link">
+        <Link
+          to="/settings"
+          className={`nav-link ${isActive("/settings") ? "active" : ""}`}
+        >
           <FaCog className="nav-icon" /> Settings
         </Link>
       </nav>

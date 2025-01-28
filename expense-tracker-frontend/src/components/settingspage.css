@@ -1,28 +1,33 @@
 .settings-container {
-    padding: 24px;
-    max-width: 800px;
-    margin: 0 auto;
+    padding: 20px; /* Increase padding for consistent spacing */
+    max-width: 850px;
+    margin: 0; /* Remove centering auto margin */
     font-family: Arial, sans-serif;
+    text-align: left; /* Ensure content aligns to the left */
   }
   
   .settings-title {
     font-size: 2rem;
     font-weight: bold;
-    margin-bottom: 8px;
+    margin-bottom: 16px; /* Increase space below the title */
+    text-align: left; /* Align the title to the left */
   }
   
   .settings-description {
     font-size: 1rem;
     color: #6b7280;
-    margin-bottom: 24px;
+    margin-bottom: 32px; /* Increase space for better separation */
+    text-align: left; /* Align the description to the left */
   }
   
   .card {
     background: #fff;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
-    margin-bottom: 24px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.05);
+    margin-bottom: 32px; /* Increased space between cards */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.05);    
+    padding: 16px; /* Add padding inside the card for better spacing */
+    text-align: left; /* Align card content to the left */
   }
   
   .card.danger {
@@ -30,14 +35,15 @@
   }
   
   .card-header {
-    padding: 16px;
+    padding-bottom: 8px; /* Reduce padding for tighter header */
     border-bottom: 1px solid #e5e7eb;
+    text-align: left; /* Align the header content to the left */
   }
   
   .card-header h2 {
     font-size: 1.25rem;
     font-weight: bold;
-    margin: 0 0 4px;
+    margin: 0 0 8px; /* Increase space below header text */
   }
   
   .card-header p {
@@ -47,21 +53,23 @@
   }
   
   .card-content {
-    padding: 16px;
+    padding: 16px 16px 24px; /* More padding at the bottom for spacing */
+    text-align: left; /* Align content to the left */
   }
   
   .card-footer {
     padding: 16px;
     border-top: 1px solid #e5e7eb;
-    text-align: right;
+    text-align: right; /* Footer actions align to the right */
   }
   
   .input {
-    width: 100%;
-    padding: 10px;
+    width: 95%;
+    padding: 14px; /* Add padding for better touch targets */
     border: 1px solid #d1d5db;
     border-radius: 4px;
     font-size: 1rem;
+    margin-bottom: 24px; /* Space between inputs */
   }
   
   .input:focus {
@@ -71,7 +79,7 @@
   }
   
   .button {
-    padding: 10px 20px;
+    padding: 12px 24px;
     border: none;
     border-radius: 4px;
     font-size: 1rem;
@@ -80,10 +88,11 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    text-align: left; /* Align button text and icon left */
   }
   
   .button.primary {
-    background: #1f2937;
+    background: #000000;
     color: #fff;
   }
   
@@ -92,7 +101,7 @@
   }
   
   .button.danger {
-    background: #f87171;
+    background: #c84343;
     color: #fff;
   }
   
@@ -104,4 +113,4 @@
     width: 16px;
     height: 16px;
   }
-  
+      

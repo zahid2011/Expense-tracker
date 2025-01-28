@@ -95,6 +95,18 @@
   background-color: #000000; /* Solid black hover effect */
 }
 
+.nav-link.active {
+  background-color: black; /* Highlight background */
+  color: white; /* Active text color */
+  font-weight: bold; /* Emphasize the active link */
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5); /* Optional styling for emphasis */
+}
+
+.nav-link.active:hover {
+  background-color: #1a1a1a; /* Slightly lighter shade on hover */
+}
+
+
 /* Main Content */
 .main-content {
   margin-left: 250px; /* Matches the sidebar width */
@@ -103,3 +115,4 @@
   background-color: #f8f9fa;
   font-family: Arial, sans-serif;
 }
+

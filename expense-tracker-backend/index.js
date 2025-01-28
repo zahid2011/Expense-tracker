@@ -125,13 +125,30 @@ app.post("/expenses", async (req, res) => {
 });
 
 app.get("/expenses", async (req, res) => {
+  const { userId, budgetId, category, dateFrom, dateTo } = req.query;
+
   try {
-    const expenses = await prisma.expense.findMany();
+    const expenses = await prisma.expense.findMany({
+      where: {
+        userId: userId ? parseInt(userId) : undefined,
+        budgetId: budgetId ? parseInt(budgetId) : undefined,
+        category: category || undefined,
+        date: {
+          gte: dateFrom ? new Date(dateFrom) : undefined,
+          lte: dateTo ? new Date(dateTo) : undefined,
+        },
+      },
+      include: {
+        budget: true,
+      },
+    });
     res.json(expenses);
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+
 
 app.get("/expenses/:userId", async (req, res) => {
   const { userId } = req.params; // Get userId from route params
