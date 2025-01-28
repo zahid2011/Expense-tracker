@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
+import { FaChartBar, FaPiggyBank, FaFileInvoiceDollar, FaCog } from "react-icons/fa";
 
 export default function Sidebar() {
   const navigate = useNavigate();
@@ -11,19 +12,39 @@ export default function Sidebar() {
 
   return (
     <div className="sidebar">
-      <div>
-        <h2>Expense Tracker</h2>
-        {user && <p>Hello, {user.name}!</p>}
-        <nav>
-          <Link to="/dashboard">📊 Dashboard</Link>
-          <Link to="/budget">💰 Budgets</Link>
-          <Link to="/expenses">🧾 Expenses</Link>
-          <Link to="/settings">⚙️ Settings</Link>
-        </nav>
+      {/* Sidebar Title */}
+      <h1 className="sidebar-title">Expense Tracker</h1>
+
+      {/* User Info */}
+      <div className="user-info">
+        {user && (
+          <>
+            <p className="user-name">Hello, {user.name}!</p>
+            <p className="user-email">{user.email}</p>
+          </>
+        )}
       </div>
-      <div>
-        <button onClick={handleLogout}>Logout</button>
-      </div>
+
+      {/* Navigation Links */}
+      <nav className="nav-links">
+        <Link to="/dashboard" className="nav-link">
+          <FaChartBar className="nav-icon" /> Dashboard
+        </Link>
+        <Link to="/budget" className="nav-link">
+          <FaPiggyBank className="nav-icon" /> Budgets
+        </Link>
+        <Link to="/expenses" className="nav-link">
+          <FaFileInvoiceDollar className="nav-icon" /> Expenses
+        </Link>
+        <Link to="/settings" className="nav-link">
+          <FaCog className="nav-icon" /> Settings
+        </Link>
+      </nav>
+
+      {/* Logout Button */}
+      <button className="logout-btn" onClick={handleLogout}>
+        Logout
+      </button>
     </div>
   );
 }

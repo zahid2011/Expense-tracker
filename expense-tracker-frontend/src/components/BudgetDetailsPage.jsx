@@ -5,7 +5,7 @@ import "./BudgetDetailsPage.css";
 
 const BudgetDetailsPage = () => {
   const { id } = useParams();
-  const navigate = useNavigate(); // For back navigation
+  const navigate = useNavigate();
   const [budget, setBudget] = useState(null);
   const [expenses, setExpenses] = useState([]);
   const [formData, setFormData] = useState({
@@ -54,6 +54,7 @@ const BudgetDetailsPage = () => {
 
   const totalSpent = expenses.reduce((sum, expense) => sum + expense.amount, 0);
   const remainingBudget = budget.amount - totalSpent;
+  const percentageUsed = ((totalSpent / budget.amount) * 100).toFixed(1);
 
   return (
     <div className="budget-details-container">
@@ -67,7 +68,7 @@ const BudgetDetailsPage = () => {
       {/* Budget Header */}
       <div className="budget-header">
         <h1>
-          {budget.emoji} {budget.name}
+          {budget.emoji} {budget.name} Budget
         </h1>
         <button
           className="add-transaction-btn"
@@ -82,7 +83,7 @@ const BudgetDetailsPage = () => {
       {/* Budget Stats */}
       <div className="budget-stats">
         <div className="stat-card">
-          <p>Monthly Budget</p>
+          <p>Total Budget</p>
           <h3>${budget.amount.toFixed(2)}</h3>
         </div>
         <div className="stat-card spent">
@@ -95,17 +96,20 @@ const BudgetDetailsPage = () => {
         </div>
       </div>
 
-      {/* Monthly Progress */}
+      {/* Total Progress */}
       <div className="progress-card">
-        <h2>Monthly Progress</h2>
-        <p>
-          ${totalSpent.toFixed(2)} spent of ${budget.amount.toFixed(2)} budget
-        </p>
+        <h2>Total Budget Progress</h2>
+        <div className="progress-header">
+          <p>
+            ${totalSpent.toFixed(2)} spent of ${budget.amount.toFixed(2)} budget
+          </p>
+          <p className="percentage-used">{percentageUsed}% used</p>
+        </div>
         <div className="progress-bar-container">
           <div
             className="progress-bar"
             style={{
-              width: `${(totalSpent / budget.amount) * 100}%`,
+              width: `${percentageUsed}%`,
             }}
           ></div>
         </div>

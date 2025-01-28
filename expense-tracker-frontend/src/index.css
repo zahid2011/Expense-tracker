@@ -1,63 +1,103 @@
 /* Sidebar styles */
 .sidebar {
-  width: 185px; /* Matches the margin-left of .main-content */
+  width: 250px;
   height: 100vh;
   position: fixed;
   top: 0;
   left: 0;
-  background-color: #1f2937;
-  color: white;
+  background-color: white; /* White background */
+  color: #1f2937; /* Dark text for contrast */
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Ensures the logout button stays at the bottom */
-  padding: 15px;
+  justify-content: space-between; /* Keep logout button at the bottom */
+  padding: 20px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Divider effect */
+  border-right: 2px solid black; /* Black divider between sidebar and main content */
   box-sizing: border-box;
+  font-family: Arial, sans-serif;
 }
 
-.sidebar h2 {
-  font-size: 20px;
+/* Sidebar Title */
+.sidebar-title {
+  font-size: 24px;
   font-weight: bold;
+  color: black;
   margin-bottom: 20px;
+  text-align: center; /* Center-align the title */
+  white-space: nowrap; /* Ensure the title stays on one line */
+  overflow: hidden; /* Prevent overflow */
+  text-overflow: ellipsis; /* Add ellipsis if it overflows */
 }
 
-.sidebar nav a {
-  display: block;
-  padding: 8px 10px;
-  color: white;
+/* User Info Styles */
+.user-info {
+  background-color: black; /* Black background */
+  color: white; /* White text */
+  padding: 15px;
+  border-radius: 10px; /* Rounded corners */
+  margin-bottom: 20px; /* Spacing below user info */
+  text-align: center;
+}
+
+.user-name {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.user-email {
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Navigation Links */
+.nav-links {
+  flex-grow: 1; /* Allow navigation links to take available space */
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  color: #1f2937;
   text-decoration: none;
   border-radius: 5px;
   margin-bottom: 10px;
+  font-size: 16px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.nav-link:hover {
+  background-color: black; /* Black background on hover */
+  color: white; /* White text on hover */
+}
+
+.nav-icon {
+  font-size: 20px;
+  margin-right: 10px;
+}
+
+/* Logout Button */
+.logout-btn {
+  background-color: black; /* Black button */
+  color: white; /* White text */
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer;
   font-size: 14px;
+  width: 100%;
+  font-weight: bold;
   transition: background-color 0.3s ease;
 }
 
-.sidebar nav a:hover {
-  background-color: #374151;
+.logout-btn:hover {
+  background-color: #000000; /* Solid black hover effect */
 }
 
-/* Ensure the Logout button stays visible */
-.sidebar button {
-  background-color: #dc2626;
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 14px;
-  position: absolute; /* Ensures the button is positioned correctly */
-  bottom: 15px; /* Positions the button at the bottom of the sidebar */
-  left: 15px; /* Aligns it with the sidebar's padding */
-  width: calc(100% - 30px); /* Ensures the button stays within the sidebar */
-}
-
-.sidebar button:hover {
-  background-color: #b91c1c;
-}
-
-/* Main content styles */
+/* Main Content */
 .main-content {
-  margin-left: 170px; /* Matches the sidebar width */
+  margin-left: 250px; /* Matches the sidebar width */
   padding: 20px;
   min-height: 100vh;
   background-color: #f8f9fa;

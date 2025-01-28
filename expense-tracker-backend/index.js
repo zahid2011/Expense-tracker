@@ -40,6 +40,52 @@ app.post("/users", async (req, res) => {
   }
 });
 
+app.get("/users/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: parseInt(id) },
+    });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch user data" });
+  }
+});
+
+
+app.put("/users/:id", async (req, res) => {
+  const { id } = req.params;
+  const { name, email } = req.body;
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { id: parseInt(id) },
+      data: { name, email },
+    });
+    res.json(updatedUser);
+  } catch (error) {
+    res.status(400).json({ error: "Failed to update user data" });
+  }
+});
+
+
+app.put("/users/:id/password", async (req, res) => {
+  const { id } = req.params;
+  const { newPassword } = req.body;
+
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { id: parseInt(id) },
+      data: { password: newPassword },
+    });
+    res.json(updatedUser);
+  } catch (error) {
+    res.status(400).json({ error: "Failed to update password" });
+  }
+});
+
 // Login Endpoint
 app.post("/expenses", async (req, res) => {
   const { description, amount, date, category, userId } = req.body;
