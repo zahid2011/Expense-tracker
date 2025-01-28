@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { SlidersHorizontal } from "lucide-react"; // Dropdown icon
 import "./BudgetDetailsPage.css";
 
 const BudgetDetailsPage = () => {
@@ -14,6 +15,7 @@ const BudgetDetailsPage = () => {
     date: new Date().toISOString().split("T")[0],
     category: "",
   });
+  const [showMenu, setShowMenu] = useState(false); // Dropdown menu state
 
   const fetchBudgetDetails = async () => {
     try {
@@ -46,6 +48,21 @@ const BudgetDetailsPage = () => {
     }
   };
 
+  const handleDeleteBudget = async () => {
+    if (window.confirm("Are you sure you want to delete this budget?")) {
+      try {
+        await axios.delete(`http://localhost:5000/budget/${id}`);
+        navigate("/budgets");
+      } catch (error) {
+        alert("Error deleting budget: " + error.message);
+      }
+    }
+  };
+
+  const handleEditBudget = () => {
+    navigate(`/edit-budget/${id}`);
+  };
+
   useEffect(() => {
     fetchBudgetDetails();
   }, []);
@@ -70,14 +87,30 @@ const BudgetDetailsPage = () => {
         <h1>
           {budget.emoji} {budget.name} Budget
         </h1>
-        <button
-          className="add-transaction-btn"
-          onClick={() =>
-            document.getElementById("add-transaction-form").scrollIntoView()
-          }
-        >
-          Add Transaction
-        </button>
+        <div className="header-buttons">
+          <button
+            className="add-transaction-btn"
+            onClick={() =>
+              document.getElementById("add-transaction-form").scrollIntoView()
+            }
+          >
+            Add Transaction
+          </button>
+          <div className="edit-delete-container">
+            <SlidersHorizontal
+              className="icon"
+              onClick={() => setShowMenu((prev) => !prev)}
+            />
+            {showMenu && (
+              <div className="menu-dropdown">
+                <p onClick={handleEditBudget}>Edit</p>
+                <p className="delete" onClick={handleDeleteBudget}>
+                  Delete
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Budget Stats */}
