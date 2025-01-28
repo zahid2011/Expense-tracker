@@ -5,7 +5,7 @@
   
   .expenses-header {
     display: flex;
-    justify-content: space-between; /* Align title and button horizontally */
+    justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
   }
@@ -38,10 +38,6 @@
     font-size: 1rem;
   }
   
-  .export-button .icon {
-    font-size: 1rem;
-  }
-  
   .export-button:hover {
     background-color: #333;
   }
@@ -52,7 +48,7 @@
   
   .input {
     width: 100%;
-    padding: 10px 10px 10px 36px;
+    padding: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 1rem;
@@ -70,7 +66,6 @@
     border-radius: 8px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
     text-align: center;
-    position: relative;
   }
   
   .card h3 {
@@ -80,7 +75,7 @@
   
   .card .icon {
     font-size: 1.5rem;
-    color: #000000;
+    color: #000;
     margin-bottom: 8px;
   }
   
@@ -96,39 +91,46 @@
     padding: 16px;
     border-radius: 8px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
   }
   
   .card-header {
     margin-bottom: 16px;
+    padding-left: 16px; /* Add padding for space */
   }
   
   .card-title {
     font-size: 1.5rem;
     font-weight: bold;
-  }
-  
-  .card-description {
-    font-size: 0.875rem;
-    color: #6b7280;
-  }
+    margin-bottom: 8px; /* Ensure consistent spacing with subtitle */
+    text-align: left; /* Align to the left */
+   }
+
+    .card-description {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-top: 0; /* Remove unnecessary margin */
+        margin-bottom: 20px;
+        text-align: left; /* Align to the left */
+    }
   
   .expenses-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 16px;
+    padding-left: 16px; /* Add space to the left */
   }
   
   .expenses-table th,
   .expenses-table td {
-    border: 1px solid #ddd;
-    padding: 10px;
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
     text-align: left;
   }
   
   .expenses-table th {
     background-color: #f4f4f4;
     font-weight: bold;
-    color: #6b7280;
   }
   
   .expenses-table td {
@@ -141,5 +143,39 @@
   
   .expenses-table tr:hover {
     background: #f1f5f9;
+  }
+  
+  
+  .action-menu {
+    position: relative;
+  }
+  
+  .action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .dropdown {
+    position: absolute;
+    right: 0;
+    top: 24px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+  }
+  
+  .dropdown div {
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .dropdown div:hover {
+    background-color: #f4f4f4;
   }
   

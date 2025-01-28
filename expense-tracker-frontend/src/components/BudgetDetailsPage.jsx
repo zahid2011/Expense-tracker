@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { SlidersHorizontal } from "lucide-react"; // Dropdown icon
+import { SlidersHorizontal, Trash } from "lucide-react"; // Icons
 import "./BudgetDetailsPage.css";
 
 const BudgetDetailsPage = () => {
@@ -14,8 +14,24 @@ const BudgetDetailsPage = () => {
     amount: "",
     date: new Date().toISOString().split("T")[0],
     category: "",
+    customCategory: "",
   });
   const [showMenu, setShowMenu] = useState(false); // Dropdown menu state
+  const [showDeleteModal, setShowDeleteModal] = useState(false); // Modal state
+  const [expenseToDelete, setExpenseToDelete] = useState(null); // Expense ID to delete
+
+  const categories = [
+    "Groceries",
+    "Rent",
+    "Transportation",
+    "Utilities",
+    "Entertainment",
+    "Dining Out",
+    "Healthcare",
+    "Education",
+    "Savings",
+    "Other",
+  ];
 
   const fetchBudgetDetails = async () => {
     try {
@@ -31,20 +47,42 @@ const BudgetDetailsPage = () => {
     e.preventDefault();
     try {
       const user = JSON.parse(localStorage.getItem("user"));
+      const category =
+        formData.category === "Other" ? formData.customCategory : formData.category;
+
       await axios.post(`http://localhost:5000/budget/${budget.id}/expense`, {
         ...formData,
+        category,
         amount: parseFloat(formData.amount),
         userId: user.id,
       });
+
       fetchBudgetDetails();
       setFormData({
         description: "",
         amount: "",
         date: new Date().toISOString().split("T")[0],
         category: "",
+        customCategory: "",
       });
     } catch (error) {
       alert("Error adding expense: " + error.message);
+    }
+  };
+
+  const handleDeleteExpense = (expenseId) => {
+    setExpenseToDelete(expenseId);
+    setShowDeleteModal(true); // Show confirmation modal
+  };
+
+  const confirmDeleteExpense = async () => {
+    try {
+      await axios.delete(`http://localhost:5000/transactions/${expenseToDelete}`);
+      setExpenseToDelete(null);
+      setShowDeleteModal(false); // Close modal
+      fetchBudgetDetails();
+    } catch (error) {
+      alert("Error deleting transaction: " + error.message);
     }
   };
 
@@ -149,24 +187,35 @@ const BudgetDetailsPage = () => {
       </div>
 
       {/* Recent Transactions */}
-      <div className="transactions-card">
+        <div className="transactions-card">
         <h2>Recent Transactions</h2>
         {expenses
-          .slice(0)
-          .reverse()
-          .map((expense) => (
-            <div key={expense.id} className="transaction-item">
-              <div>
+            .slice(0)
+            .reverse()
+            .map((expense) => (
+            <div key={expense.id} className="transaction-card">
+                <div className="transaction-details">
                 <h3>{expense.description}</h3>
-                <p>
-                  {expense.category} |{" "}
-                  {new Date(expense.date).toLocaleDateString()}
+                <p>{expense.category}</p>
+                <p className="transaction-date">
+                    {new Date(expense.date).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    })}
                 </p>
-              </div>
-              <h3 className="expense-amount">${expense.amount.toFixed(2)}</h3>
+                </div>
+
+                <div className="transaction-actions">
+                <h3 className="expense-amount">${expense.amount.toFixed(2)}</h3>
+                <Trash
+                    className="delete-icon"
+                    onClick={() => handleDeleteExpense(expense.id)}
+                />
+                </div>
             </div>
-          ))}
-      </div>
+            ))}
+        </div>
 
       {/* Add Transaction Form */}
       <div id="add-transaction-form" className="add-transaction-card">
@@ -198,18 +247,52 @@ const BudgetDetailsPage = () => {
             }
             required
           />
-          <input
-            type="text"
-            placeholder="Category"
+          <select
             value={formData.category}
-            onChange={(e) =>
-              setFormData({ ...formData, category: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
             required
-          />
+          >
+            <option value="">Select a Category</option>
+            {categories.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
+          {formData.category === "Other" && (
+            <input
+              type="text"
+              placeholder="Enter custom category"
+              value={formData.customCategory}
+              onChange={(e) =>
+                setFormData({ ...formData, customCategory: e.target.value })
+              }
+              required
+            />
+          )}
           <button type="submit">Add</button>
         </form>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <p>Are you sure you want to delete this transaction?</p>
+            <div className="modal-buttons">
+              <button className="confirm-btn" onClick={confirmDeleteExpense}>
+                Yes, Delete
+              </button>
+              <button
+                className="cancel-btn"
+                onClick={() => setShowDeleteModal(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

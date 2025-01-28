@@ -1,5 +1,5 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { FaChartBar, FaPiggyBank, FaFileInvoiceDollar, FaCog } from "react-icons/fa";
+import { FaChartBar, FaPiggyBank, FaFileInvoiceDollar, FaCog, FaDollarSign } from "react-icons/fa";
 
 export default function Sidebar() {
   const navigate = useNavigate();
@@ -41,6 +41,12 @@ export default function Sidebar() {
           className={`nav-link ${isActive("/budget") ? "active" : ""}`}
         >
           <FaPiggyBank className="nav-icon" /> Budgets
+        </Link>
+        <Link
+          to="/income"
+          className={`nav-link ${isActive("/income") ? "active" : ""}`}
+        >
+          <FaDollarSign className="nav-icon" /> Income
         </Link>
         <Link
           to="/expenses"

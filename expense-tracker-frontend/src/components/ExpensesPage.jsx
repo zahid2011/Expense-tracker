@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { CreditCard, Download } from "lucide-react";
+import { CreditCard, Download, MoreHorizontal, Edit, Trash2 } from "lucide-react";
 import "./ExpensesPage.css";
 
 const ExpensesPage = () => {
   const [expenses, setExpenses] = useState([]);
   const [search, setSearch] = useState("");
+  const [actionMenu, setActionMenu] = useState(null);
 
   useEffect(() => {
     const fetchExpenses = async () => {
@@ -29,17 +30,26 @@ const ExpensesPage = () => {
     alert("Export functionality coming soon!");
   };
 
+  const toggleActionMenu = (id) => {
+    setActionMenu(actionMenu === id ? null : id);
+  };
+
+  const handleEdit = (id) => {
+    alert(`Edit functionality for expense ID: ${id} coming soon!`);
+  };
+
+  const handleDelete = (id) => {
+    alert(`Delete functionality for expense ID: ${id} coming soon!`);
+  };
+
   return (
     <div className="expenses-container">
       {/* Header */}
       <div className="expenses-header">
-        {/* Title and Subtitle */}
         <div className="expenses-title-container">
           <h1 className="expenses-title">All Expenses</h1>
           <p className="expenses-subtitle">View and manage your transaction history</p>
         </div>
-
-        {/* Export Button */}
         <button className="export-button" onClick={handleExport}>
           <Download className="icon" /> Export
         </button>
@@ -68,36 +78,54 @@ const ExpensesPage = () => {
         </div>
       </div>
 
-      {/* Expense Table */}
+      {/* Expense Entries Card */}
       <div className="expense-history-card">
-        <div className="card-header">
-          <h2 className="card-title">Expense History</h2>
-          <p className="card-description">A detailed list of all your expenses</p>
-        </div>
-        <div className="card-content">
-          <table className="expenses-table">
-            <thead>
-              <tr>
-                <th>Description</th>
-                <th>Category</th>
-                <th>Date</th>
-                <th>Budget</th>
-                <th>Amount</th>
+        <h2 className="card-title">Expense Entries</h2>
+        <p className="card-description">A detailed list of all your expenses</p>
+        <table className="expenses-table">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Category</th>
+              <th>Date</th>
+              <th>Amount</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredExpenses.map((expense) => (
+              <tr key={expense.id}>
+                <td>{expense.description}</td>
+                <td>{expense.category}</td>
+                <td>{new Date(expense.date).toLocaleDateString()}</td>
+                <td>${expense.amount.toFixed(2)}</td>
+                <td>
+                  <div className="action-menu">
+                    <button
+                      className="action-btn"
+                      onClick={() => toggleActionMenu(expense.id)}
+                    >
+                      <MoreHorizontal />
+                    </button>
+                    {actionMenu === expense.id && (
+                      <div className="dropdown">
+                        <div onClick={() => handleEdit(expense.id)}>
+                          <Edit size={16} /> Edit
+                        </div>
+                        <div
+                          onClick={() => handleDelete(expense.id)}
+                          style={{ color: "red" }}
+                        >
+                          <Trash2 size={16} /> Delete
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {filteredExpenses.map((expense) => (
-                <tr key={expense.id}>
-                  <td>{expense.description}</td>
-                  <td>{expense.category}</td>
-                  <td>{new Date(expense.date).toLocaleDateString()}</td>
-                  <td>{expense.budget ? expense.budget.name : "N/A"}</td>
-                  <td>${expense.amount.toFixed(2)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

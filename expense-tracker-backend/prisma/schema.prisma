@@ -7,16 +7,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Expense {
-  id          Int      @id @default(autoincrement())
-  description String
-  amount      Float
-  date        DateTime
-  category    String
-  userId      Int
-  budgetId    Int
-  user        User     @relation("UserExpenses", fields: [userId], references: [id]) // Relation to User
-  budget      Budget   @relation("BudgetExpenses", fields: [budgetId], references: [id]) // Relation to Budget
+model User {
+  id       Int       @id @default(autoincrement())
+  name     String
+  email    String    @unique
+  password String
+  expenses Expense[] @relation("UserExpenses") // Relation to Expenses
+  budgets  Budget[]  @relation("UserBudgets") // Relation to Budgets
+  incomes  Income[]  @relation("UserIncomes") // Relation to Incomes
 }
 
 model Budget {
@@ -30,11 +28,24 @@ model Budget {
   expenses  Expense[] @relation("BudgetExpenses") // Relation to Expenses
 }
 
-model User {
-  id       Int       @id @default(autoincrement())
-  name     String
-  email    String    @unique
-  password String
-  expenses Expense[] @relation("UserExpenses") // Relation to Expenses
-  budgets  Budget[]  @relation("UserBudgets") // Relation to Budgets
+model Expense {
+  id          Int      @id @default(autoincrement())
+  description String
+  amount      Float
+  date        DateTime
+  category    String
+  userId      Int
+  budgetId    Int
+  user        User     @relation("UserExpenses", fields: [userId], references: [id]) // Relation to User
+  budget      Budget   @relation("BudgetExpenses", fields: [budgetId], references: [id]) // Relation to Budget
+}
+
+model Income {
+  id          Int      @id @default(autoincrement())
+  source      String   // e.g., Salary, Freelance, Dividends
+  category    String   // e.g., Employment, Investments
+  amount      Float
+  date        DateTime
+  userId      Int
+  user        User     @relation("UserIncomes", fields: [userId], references: [id]) // Relation to User
 }

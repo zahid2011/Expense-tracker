@@ -236,6 +236,44 @@ app.post("/budget/:id/expense", async (req, res) => {
   }
 });
 
+app.delete("/transactions/:id", async (req, res) => {
+  const { id } = req.params; // Transaction ID
+  try {
+    await prisma.expense.delete({
+      where: { id: parseInt(id) },
+    });
+    res.json({ message: "Transaction deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete transaction" });
+  }
+});
+
+app.post("/incomes", async (req, res) => {
+  const { source, category, amount, date, userId } = req.body;
+
+  try {
+    const newIncome = await prisma.income.create({
+      data: { source, category, amount, date: new Date(date), userId: parseInt(userId) },
+    });
+    res.json(newIncome);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.get("/incomes/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const incomes = await prisma.income.findMany({
+      where: { userId: parseInt(userId) },
+    });
+    res.json(incomes);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Start the server
 app.listen(5000, () => {
   console.log("Server is running on http://localhost:5000");

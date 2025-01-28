@@ -6,19 +6,22 @@ import UserForm from "./components/UserForm";
 import BudgetPage from "./components/BudgetPage";
 import ExpensesPage from "./components/ExpensesPage";
 import SettingsPage from "./components/SettingsPage";
+import IncomePage from "./components/IncomePage"; // Import the IncomePage component
 import ProtectedLayout from "./components/ProtectedLayout";
 import Sidebar from "./components/Sidebar";
-import BudgetDetailsPage from "./components/BudgetDetailsPage"; // Import BudgetDetailsPage
+import BudgetDetailsPage from "./components/BudgetDetailsPage";
 
 const App = () => {
   return (
     <Router>
       <Routes>
+        {/* Public Routes */}
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<UserForm />} />
 
-        {/* Protected routes with sidebar */}
+        {/* Protected Routes */}
         <Route element={<ProtectedLayout />}>
+          {/* Dashboard */}
           <Route
             path="/dashboard"
             element={
@@ -30,6 +33,7 @@ const App = () => {
               </div>
             }
           />
+          {/* Budgets */}
           <Route
             path="/budget"
             element={
@@ -42,7 +46,7 @@ const App = () => {
             }
           />
           <Route
-            path="/budget/:id" // Add the route for Budget Details Page
+            path="/budget/:id"
             element={
               <div className="flex">
                 <Sidebar />
@@ -52,6 +56,7 @@ const App = () => {
               </div>
             }
           />
+          {/* Expenses */}
           <Route
             path="/expenses"
             element={
@@ -63,6 +68,19 @@ const App = () => {
               </div>
             }
           />
+          {/* Income */}
+          <Route
+            path="/income" // Add the route for IncomePage
+            element={
+              <div className="flex">
+                <Sidebar />
+                <div className="main-content">
+                  <IncomePage />
+                </div>
+              </div>
+            }
+          />
+          {/* Settings */}
           <Route
             path="/settings"
             element={
