@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate, Link } from "react-router-dom"; // Added Link import
+import { useNavigate, Link } from "react-router-dom";
+import { ShieldCheck, Wallet } from "lucide-react";
+import "./Auth.css";
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -10,12 +12,7 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await axios.post("http://localhost:5000/login", formData);
-      alert("Login successful!");
-
-      // Save user info in localStorage
       localStorage.setItem("user", JSON.stringify(response.data));
-
-      // Redirect to the dashboard
       navigate("/dashboard");
     } catch (error) {
       alert("Error logging in: " + (error.response?.data?.error || error.message));
@@ -23,46 +20,59 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-6 rounded shadow-md w-full max-w-sm"
-      >
-        <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
-        <input
-          type="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          className="w-full p-2 border rounded mb-4"
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-          className="w-full p-2 border rounded mb-4"
-          required
-        />
-        <button
-          type="submit"
-          className="bg-blue-500 text-white w-full py-2 rounded hover:bg-blue-600 mb-4"
-        >
-          Login
-        </button>
-        
-        {/* Added Sign Up link */}
-        <p className="text-center text-gray-600">
-          Don't have an account?{" "}
-          <Link 
-            to="/register" 
-            className="text-blue-500 hover:underline font-medium"
-          >
-            Sign Up
-          </Link>
-        </p>
-      </form>
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="welcome-icon">
+          <Wallet size={42} color="#000000" strokeWidth={1.5} />
+        </div>
+        <div className="auth-header">
+          <h1 className="auth-title">Welcome back</h1>
+          <p className="auth-subtitle">Enter your credentials to access your account</p>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <div className="auth-form-group">
+            <label className="auth-label">Email</label>
+            <input
+              type="email"
+              className="auth-input"
+              placeholder="Enter your email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              required
+            />
+          </div>
+
+          <div className="auth-form-group">
+            <label className="auth-label">Password</label>
+            <input
+              type="password"
+              className="auth-input"
+              placeholder="Enter your password"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              required
+            />
+          </div>
+
+          <div className="password-helper">
+            <Link to="/forgot-password" className="password-helper-link">
+              Forgot your password?
+            </Link>
+          </div>
+
+          <button type="submit" className="auth-button">
+            Sign in
+          </button>
+
+          <p className="auth-footer-text">
+            Don't have an account?{" "}
+            <Link to="/register" className="auth-link">
+              Sign up
+            </Link>
+          </p>
+        </form>
+      </div>
     </div>
   );
 };

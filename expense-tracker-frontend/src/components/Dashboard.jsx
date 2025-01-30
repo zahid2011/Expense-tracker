@@ -246,11 +246,11 @@ const Dashboard = () => {
       <div className="navigation-buttons">
         <div className="nav-card">
           <DollarSign size={24} />
-          <p>Add Income</p>
+          <p>Income Page</p>
         </div>
         <div className="nav-card">
           <ArrowDown size={24} />
-          <p>Add Expense</p>
+          <p>Expense Page</p>
         </div>
         <div className="nav-card">
             <Wallet size={24} /> 

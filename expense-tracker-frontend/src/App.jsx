@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
-import UserForm from "./components/UserForm";
+import Signup from "./components/Signup";
 import BudgetPage from "./components/BudgetPage";
 import ExpensesPage from "./components/ExpensesPage";
 import SettingsPage from "./components/SettingsPage";
@@ -16,8 +16,9 @@ const App = () => {
     <Router>
       <Routes>
         {/* Public Routes */}
+
         <Route path="/" element={<Login />} />
-        <Route path="/register" element={<UserForm />} />
+        <Route path="/register" element={<Signup />} />
 
         {/* Protected Routes */}
         <Route element={<ProtectedLayout />}>
