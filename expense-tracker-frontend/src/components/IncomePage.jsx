@@ -10,7 +10,7 @@ const IncomePage = () => {
     source: "",
     category: "",
     amount: "",
-    date: new Date().toISOString().split("T")[0],
+    date: new Date().toISOString(),
   });
   const [isEditing, setIsEditing] = useState(false);
   const [editingIncome, setEditingIncome] = useState(null);
@@ -21,9 +21,15 @@ const IncomePage = () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
       const response = await axios.get(`http://localhost:5000/incomes/${user.id}`);
-      setIncomes(response.data);
-
-      const total = response.data.reduce((sum, income) => sum + income.amount, 0);
+      
+      // Sort incomes by date (newest first)
+      const sortedIncomes = response.data.sort((a, b) => 
+        new Date(b.date) - new Date(a.date)
+      );
+      
+      setIncomes(sortedIncomes);
+  
+      const total = sortedIncomes.reduce((sum, income) => sum + income.amount, 0);
       setTotalIncome(total);
     } catch (error) {
       console.error("Error fetching incomes:", error);
@@ -34,24 +40,30 @@ const IncomePage = () => {
     e.preventDefault();
     try {
       const user = JSON.parse(localStorage.getItem("user"));
+      const payload = {
+        ...formData,
+        amount: parseFloat(formData.amount),
+        date: new Date(formData.date).toISOString(),
+        userId: user.id
+      };
+
       if (isEditing) {
-        await axios.put(`http://localhost:5000/incomes/${editingIncome.id}`, {
-          ...formData,
-          amount: parseFloat(formData.amount),
-        });
+        await axios.put(`http://localhost:5000/incomes/${editingIncome.id}`, payload);
         setIsEditing(false);
         setEditingIncome(null);
       } else {
-        await axios.post("http://localhost:5000/incomes", {
-          ...formData,
-          amount: parseFloat(formData.amount),
-          userId: user.id,
-        });
+        await axios.post("http://localhost:5000/incomes", payload);
       }
+      
       fetchIncomes();
-      setFormData({ source: "", category: "", amount: "", date: new Date().toISOString().split("T")[0] });
+      setFormData({ 
+        source: "", 
+        category: "", 
+        amount: "", 
+        date: new Date().toISOString() 
+      });
     } catch (error) {
-      console.error("Error adding/updating income:", error);
+      console.error("Error:", error);
     }
   };
 
@@ -62,7 +74,7 @@ const IncomePage = () => {
       source: income.source,
       category: income.category,
       amount: income.amount.toString(),
-      date: new Date(income.date).toISOString().split("T")[0],
+      date: new Date(income.date).toISOString().slice(0, 16),
     });
     document.getElementById("add-income-form").scrollIntoView({ behavior: "smooth" });
   };
@@ -92,7 +104,6 @@ const IncomePage = () => {
 
   return (
     <div className="income-page">
-      {/* Title and Add Income Button */}
       <div className="header">
         <h1>Income Management</h1>
         <button className="add-income-btn" onClick={() => document.getElementById("add-income-form").scrollIntoView({ behavior: "smooth" })}>
@@ -100,7 +111,6 @@ const IncomePage = () => {
         </button>
       </div>
 
-      {/* Income Overview */}
       <div className="income-overview">
         <div className="card">
           <h3>Total Income</h3>
@@ -108,7 +118,6 @@ const IncomePage = () => {
         </div>
       </div>
 
-      {/* Filter Dropdown */}
       <div className="filter-section">
         <label htmlFor="filter">Filter by Category:</label>
         <select id="filter" onChange={(e) => setFilter(e.target.value)}>
@@ -121,13 +130,12 @@ const IncomePage = () => {
         </select>
       </div>
 
-      {/* Income Entries */}
       <div id="income-entries" className="income-entries card">
         <h2>Income Entries</h2>
         <table>
           <thead>
             <tr>
-              <th>Date</th>
+              <th>Date & Time</th>
               <th>Source</th>
               <th>Category</th>
               <th>Amount</th>
@@ -137,7 +145,16 @@ const IncomePage = () => {
           <tbody>
             {filteredIncomes.map((income) => (
               <tr key={income.id}>
-                <td>{new Date(income.date).toLocaleDateString()}</td>
+                <td>
+                  {new Date(income.date).toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    timeZone: 'UTC'
+                  })}
+                </td>
                 <td>{income.source}</td>
                 <td>{income.category}</td>
                 <td>${income.amount.toFixed(2)}</td>
@@ -162,7 +179,6 @@ const IncomePage = () => {
         </table>
       </div>
 
-      {/* Add Income Form */}
       <div id="add-income-form" className="add-income-card">
         <h2>{isEditing ? "Edit Income" : "Add Income"}</h2>
         <form onSubmit={handleAddIncome}>
@@ -188,8 +204,8 @@ const IncomePage = () => {
             required
           />
           <input
-            type="date"
-            value={formData.date}
+            type="datetime-local"
+            value={formData.date.slice(0, 16)}
             onChange={(e) => setFormData({ ...formData, date: e.target.value })}
             required
           />

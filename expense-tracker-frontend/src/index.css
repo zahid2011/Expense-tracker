@@ -110,7 +110,7 @@
 /* Main Content */
 .main-content {
   margin-left: 250px; /* Matches the sidebar width */
-  padding: 20px;
+  padding: 10px 20px; 
   min-height: 100vh;
   background-color: #f8f9fa;
   font-family: Arial, sans-serif;
