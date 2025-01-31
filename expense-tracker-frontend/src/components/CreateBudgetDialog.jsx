@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import EmojiPicker from "emoji-picker-react";
 import "./createbudgetdialog.css";
 
-const CreateBudgetDialog = ({ onClose, fetchBudgets }) => {
+const CreateBudgetDialog = ({ onClose, fetchBudgets, editingBudget }) => {
   const [formData, setFormData] = useState({
     name: "",
     amount: "",
@@ -11,26 +11,47 @@ const CreateBudgetDialog = ({ onClose, fetchBudgets }) => {
   });
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
+  useEffect(() => {
+    if (editingBudget) {
+      setFormData({
+        name: editingBudget.name,
+        amount: editingBudget.amount,
+        emoji: editingBudget.emoji,
+      });
+    }
+  }, [editingBudget]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const user = JSON.parse(localStorage.getItem("user"));
-      await axios.post("http://localhost:5000/budgets", {
-        ...formData,
-        amount: parseFloat(formData.amount),
-        userId: user.id,
-      });
+
+      if (editingBudget) {
+        // Update existing budget
+        await axios.put(`http://localhost:5000/budget/${editingBudget.id}`, {
+          ...formData,
+          amount: parseFloat(formData.amount),
+        });
+      } else {
+        // Create new budget
+        await axios.post("http://localhost:5000/budgets", {
+          ...formData,
+          amount: parseFloat(formData.amount),
+          userId: user.id,
+        });
+      }
+
       fetchBudgets();
       onClose();
     } catch (error) {
-      alert("Error creating budget: " + error.message);
+      alert("Error saving budget: " + error.message);
     }
   };
 
   return (
     <div className="dialog-overlay">
       <div className="dialog-content">
-        <h2 className="dialog-title">Create New Budget</h2>
+        <h2 className="dialog-title">{editingBudget ? "Edit Budget" : "Create New Budget"}</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label className="form-label">Emoji</label>
@@ -82,7 +103,7 @@ const CreateBudgetDialog = ({ onClose, fetchBudgets }) => {
               Cancel
             </button>
             <button type="submit" className="create-button">
-              Create
+              {editingBudget ? "Update" : "Create"}
             </button>
           </div>
         </form>

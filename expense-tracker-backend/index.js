@@ -236,6 +236,33 @@ app.post("/budget/:id/expense", async (req, res) => {
   }
 });
 
+app.put("/budget/:id", async (req, res) => {
+  const { id } = req.params;
+  const { name, amount, emoji } = req.body;
+
+  try {
+    const updatedBudget = await prisma.budget.update({
+      where: { id: parseInt(id) },
+      data: { name, amount: parseFloat(amount), emoji },
+    });
+    res.json(updatedBudget);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to update budget" });
+  }
+});
+
+// Delete Budget
+app.delete("/budget/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await prisma.budget.delete({ where: { id: parseInt(id) } });
+    res.json({ message: "Budget deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete budget" });
+  }
+});
+
 app.delete("/transactions/:id", async (req, res) => {
   const { id } = req.params; // Transaction ID
   try {
