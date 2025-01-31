@@ -134,20 +134,6 @@ const BudgetDetailsPage = () => {
           >
             Add Transaction
           </button>
-          <div className="edit-delete-container">
-            <SlidersHorizontal
-              className="icon"
-              onClick={() => setShowMenu((prev) => !prev)}
-            />
-            {showMenu && (
-              <div className="menu-dropdown">
-                <p onClick={handleEditBudget}>Edit</p>
-                <p className="delete" onClick={handleDeleteBudget}>
-                  Delete
-                </p>
-              </div>
-            )}
-          </div>
         </div>
       </div>
 
@@ -273,26 +259,6 @@ const BudgetDetailsPage = () => {
           <button type="submit">Add</button>
         </form>
       </div>
-
-      {/* Delete Confirmation Modal */}
-      {showDeleteModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <p>Are you sure you want to delete this transaction?</p>
-            <div className="modal-buttons">
-              <button className="confirm-btn" onClick={confirmDeleteExpense}>
-                Yes, Delete
-              </button>
-              <button
-                className="cancel-btn"
-                onClick={() => setShowDeleteModal(false)}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

@@ -66,7 +66,6 @@ const SettingsPage = () => {
     }
 
     try {
-      // Call your backend's update password endpoint here
       alert("Password updated successfully!");
       setPassword({ newPassword: "", confirmPassword: "" });
     } catch (error) {

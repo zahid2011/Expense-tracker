@@ -6,7 +6,7 @@ import Signup from "./components/Signup";
 import BudgetPage from "./components/BudgetPage";
 import ExpensesPage from "./components/ExpensesPage";
 import SettingsPage from "./components/SettingsPage";
-import IncomePage from "./components/IncomePage"; // Import the IncomePage component
+import IncomePage from "./components/IncomePage";
 import ProtectedLayout from "./components/ProtectedLayout";
 import Sidebar from "./components/Sidebar";
 import BudgetDetailsPage from "./components/BudgetDetailsPage";
@@ -71,7 +71,7 @@ const App = () => {
           />
           {/* Income */}
           <Route
-            path="/income" // Add the route for IncomePage
+            path="/income" 
             element={
               <div className="flex">
                 <Sidebar />

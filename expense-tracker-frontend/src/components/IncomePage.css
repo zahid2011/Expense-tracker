@@ -31,7 +31,7 @@
   }
   
   .card {
-    padding: 50px;; /* Reduce padding, top-bottom, left-right */
+    padding: 50px;
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -66,10 +66,10 @@
     text-align: middle;
   }
   .income-entries h2 {
-    text-align: left; /* Aligns the title to the left */
-    margin-bottom: 20px; /* Adds spacing below the title */
-    font-size: 25px; /* Optional: Adjust font size */
-    font-weight: bold; /* Optional: Make it bold */
+    text-align: left; 
+    margin-bottom: 20px;
+    font-size: 25px; 
+    font-weight: bold; 
   }
   .income-entries .delete-btn,
   .income-entries .edit-btn {

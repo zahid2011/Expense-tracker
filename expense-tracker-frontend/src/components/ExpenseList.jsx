@@ -7,7 +7,6 @@ const ExpenseList = ({ expenses, setExpenses }) => {
       try {
         // Get the logged-in user from localStorage
         const user = JSON.parse(localStorage.getItem("user"));
-        // Include the user ID in the API call
         const response = await axios.get(`http://localhost:5000/expenses/${user.id}`);
         setExpenses(response.data);
       } catch (error) {
