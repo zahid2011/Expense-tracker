@@ -1,18 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Save, Trash2 } from "lucide-react";
+import axiosInstance from "../utils/axiosInstance";
 import "./settingspage.css";
-import axios from "axios";
 
 const SettingsPage = () => {
-  const [user, setUser] = useState({
-    fullName: "",
-    email: "",
-  });
-
-  const [password, setPassword] = useState({
-    newPassword: "",
-    confirmPassword: "",
-  });
+  const [user, setUser] = useState({ fullName: "", email: "" });
+  const [password, setPassword] = useState({ newPassword: "", confirmPassword: "" });
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -20,13 +13,8 @@ const SettingsPage = () => {
         const loggedInUser = JSON.parse(localStorage.getItem("user"));
         if (!loggedInUser) throw new Error("User not logged in");
 
-        const response = await axios.get(
-          `http://localhost:5000/users/${loggedInUser.id}`
-        );
-        setUser({
-          fullName: response.data.name,
-          email: response.data.email,
-        });
+        const response = await axiosInstance.get(`/users/${loggedInUser.id}`);
+        setUser({ fullName: response.data.name, email: response.data.email });
       } catch (error) {
         console.error("Failed to fetch user details:", error);
       }
@@ -48,7 +36,7 @@ const SettingsPage = () => {
   const handleSaveChanges = async () => {
     try {
       const loggedInUser = JSON.parse(localStorage.getItem("user"));
-      await axios.put(`http://localhost:5000/users/${loggedInUser.id}`, {
+      await axiosInstance.put(`/users/${loggedInUser.id}`, {
         name: user.fullName,
         email: user.email,
       });
@@ -66,6 +54,11 @@ const SettingsPage = () => {
     }
 
     try {
+      const loggedInUser = JSON.parse(localStorage.getItem("user"));
+      await axiosInstance.put(`/users/${loggedInUser.id}/password`, {
+        newPassword: password.newPassword,
+      });
+
       alert("Password updated successfully!");
       setPassword({ newPassword: "", confirmPassword: "" });
     } catch (error) {
@@ -75,15 +68,15 @@ const SettingsPage = () => {
   };
 
   const handleDeleteAccount = async () => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete your account? This action cannot be undone."
-    );
+    const confirmDelete = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
     if (confirmDelete) {
       try {
         const loggedInUser = JSON.parse(localStorage.getItem("user"));
-        await axios.delete(`http://localhost:5000/users/${loggedInUser.id}`);
+        await axiosInstance.delete(`/users/${loggedInUser.id}`);
+
         alert("Account deleted successfully!");
         localStorage.removeItem("user");
+        localStorage.removeItem("token");
         window.location.href = "/";
       } catch (error) {
         console.error("Failed to delete account:", error);
@@ -95,9 +88,7 @@ const SettingsPage = () => {
   return (
     <div className="settings-container">
       <h1 className="settings-title">Settings</h1>
-      <p className="settings-description">
-        Manage your account settings and preferences.
-      </p>
+      <p className="settings-description">Manage your account settings and preferences.</p>
 
       {/* Profile Settings */}
       <div className="card">
@@ -108,23 +99,11 @@ const SettingsPage = () => {
         <div className="card-content">
           <label className="block mb-4">
             Full Name:
-            <input
-              type="text"
-              name="fullName"
-              value={user.fullName}
-              onChange={handleInputChange}
-              className="input"
-            />
+            <input type="text" name="fullName" value={user.fullName} onChange={handleInputChange} className="input" />
           </label>
           <label className="block mb-4">
             Email Address:
-            <input
-              type="email"
-              name="email"
-              value={user.email}
-              onChange={handleInputChange}
-              className="input"
-            />
+            <input type="email" name="email" value={user.email} onChange={handleInputChange} className="input" />
           </label>
         </div>
         <div className="card-footer">
@@ -144,32 +123,15 @@ const SettingsPage = () => {
         <div className="card-content">
           <label className="block mb-4">
             New Password:
-            <input
-              type="password"
-              name="newPassword"
-              value={password.newPassword}
-              onChange={handlePasswordChange}
-              className="input"
-            />
+            <input type="password" name="newPassword" value={password.newPassword} onChange={handlePasswordChange} className="input" />
           </label>
           <label className="block mb-4">
             Confirm New Password:
-            <input
-              type="password"
-              name="confirmPassword"
-              value={password.confirmPassword}
-              onChange={handlePasswordChange}
-              className="input"
-            />
+            <input type="password" name="confirmPassword" value={password.confirmPassword} onChange={handlePasswordChange} className="input" />
           </label>
         </div>
         <div className="card-footer">
-          <button
-            onClick={handleUpdatePassword}
-            className="button primary"
-          >
-            Update Password
-          </button>
+          <button onClick={handleUpdatePassword} className="button primary">Update Password</button>
         </div>
       </div>
 

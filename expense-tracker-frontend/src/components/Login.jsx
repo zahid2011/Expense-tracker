@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
-import { ShieldCheck, Wallet } from "lucide-react";
+import { Wallet } from "lucide-react";
 import "./Auth.css";
 
 const Login = () => {
@@ -12,7 +12,15 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await axios.post("http://localhost:5000/login", formData);
-      localStorage.setItem("user", JSON.stringify(response.data));
+
+      // Store the token separately
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify({
+        id: response.data.userId,
+        name: response.data.name,
+        email: response.data.email
+      }));
+
       navigate("/dashboard");
     } catch (error) {
       alert("Error logging in: " + (error.response?.data?.error || error.message));

@@ -70,6 +70,7 @@
   text-align: left;
   transition: all 0.3s ease;
   position: relative; /* Needed for positioning action menu */
+  cursor: pointer; 
 }
 
 .budget-card:hover {
@@ -168,7 +169,8 @@
   gap: 8px;
   font-size: 14px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background-color 0.2s ease;
+
 }
 
 .action-item:hover {
@@ -182,3 +184,4 @@
 .action-item.delete:hover {
   background: #f8d7da;
 }
+

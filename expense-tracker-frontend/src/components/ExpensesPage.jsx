@@ -9,13 +9,26 @@ const ExpensesPage = () => {
 
   useEffect(() => {
     const fetchExpenses = async () => {
-      const response = await fetch("http://localhost:5000/expenses");
-      const data = await response.json();
-      setExpenses(data);
+      try {
+        const token = localStorage.getItem("token"); 
+        const response = await fetch("http://localhost:5000/expenses", {
+          headers: { Authorization: `Bearer ${token}` }, 
+        });
+  
+        if (!response.ok) {
+          throw new Error("Failed to fetch expenses");
+        }
+  
+        const data = await response.json();
+        setExpenses(data);
+      } catch (error) {
+        console.error("Error fetching expenses:", error);
+      }
     };
-
+  
     fetchExpenses();
   }, []);
+  
 
   const filteredExpenses = expenses.filter((expense) =>
     expense.description.toLowerCase().includes(search.toLowerCase())
@@ -38,9 +51,27 @@ const ExpensesPage = () => {
     alert(`Edit functionality for expense ID: ${id} coming soon!`);
   };
 
-  const handleDelete = (id) => {
-    alert(`Delete functionality for expense ID: ${id} coming soon!`);
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this transaction?")) return;
+  
+    try {
+      const token = localStorage.getItem("token"); 
+      const response = await fetch(`http://localhost:5000/transactions/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` }, 
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to delete transaction");
+      }
+  
+      setExpenses(expenses.filter((expense) => expense.id !== id));
+    } catch (error) {
+      console.error("Error deleting transaction:", error);
+      alert("Failed to delete transaction.");
+    }
   };
+  
 
   return (
     <div className="expenses-container">

@@ -56,8 +56,15 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const user = JSON.parse(localStorage.getItem("user"));
-        
+        const token = localStorage.getItem("token");
+  
+        if (!token) {
+          console.error("No token found. User may not be authenticated.");
+          return;
+        }
+  
+        const headers = { Authorization: `Bearer ${token}` };
+  
         const [
           summaryRes, 
           barRes, 
@@ -65,17 +72,17 @@ const Dashboard = () => {
           expensesRes,
           incomesRes
         ] = await Promise.all([
-          fetch(`http://localhost:5000/summary/${user.id}`),
-          fetch(`http://localhost:5000/chart-data/${user.id}`),
-          fetch(`http://localhost:5000/pie-chart-data/${user.id}`),
-          fetch(`http://localhost:5000/expenses/${user.id}`),
-          fetch(`http://localhost:5000/incomes/${user.id}`)
+          fetch("http://localhost:5000/summary", { headers }),
+          fetch("http://localhost:5000/chart-data", { headers }),
+          fetch("http://localhost:5000/pie-chart-data", { headers }),
+          fetch("http://localhost:5000/expenses", { headers }),
+          fetch("http://localhost:5000/incomes", { headers })
         ]);
-
+  
         // Process summary data
         const summaryData = await summaryRes.json();
         setSummary(summaryData);
-
+  
         // Process bar chart data
         const barData = await barRes.json();
         setBarChartData({
@@ -97,7 +104,7 @@ const Dashboard = () => {
             },
           ]
         });
-
+  
         // Process pie chart data
         const pieData = await pieRes.json();
         setPieChartData({
@@ -111,7 +118,7 @@ const Dashboard = () => {
             hoverOffset: 4,
           }]
         });
-
+  
         // Process transactions
         const expenses = await expensesRes.json();
         const incomes = await incomesRes.json();
@@ -120,16 +127,17 @@ const Dashboard = () => {
           ...incomes.map(i => ({ ...i, type: 'income' }))
         ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
          .slice(0, 6);
-
+  
         setTransactions(allTransactions);
-
+  
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-
+  
     fetchData();
   }, []);
+  
 
   return (
     <div className="dashboard-container">

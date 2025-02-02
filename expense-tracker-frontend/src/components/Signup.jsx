@@ -14,10 +14,20 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (formData.password !== formData.confirmPassword) {
+      return alert("Passwords do not match!");
+    }
+
     try {
-      await axios.post("http://localhost:5000/register", formData);
+      await axios.post("http://localhost:5000/users", {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password
+      });
+
       alert("Registration successful!");
-      navigate("/login");
+      navigate("/");
     } catch (error) {
       alert("Error registering: " + (error.response?.data?.error || error.message));
     }

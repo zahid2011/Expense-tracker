@@ -8,14 +8,16 @@ import "./budgetpage.css";
 const BudgetPage = () => {
   const [budgets, setBudgets] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingBudget, setEditingBudget] = useState(null); // Track the budget being edited
-  const [openMenu, setOpenMenu] = useState(null); // Track which action menu is open
+  const [editingBudget, setEditingBudget] = useState(null); 
+  const [openMenu, setOpenMenu] = useState(null); 
   const navigate = useNavigate();
 
   const fetchBudgets = async () => {
     try {
-      const user = JSON.parse(localStorage.getItem("user"));
-      const response = await axios.get(`http://localhost:5000/budgets/${user.id}`);
+      const token = localStorage.getItem("token"); 
+      const response = await axios.get("http://localhost:5000/budgets", {
+        headers: { Authorization: `Bearer ${token}` }, 
+      });
       setBudgets(response.data);
     } catch (error) {
       console.error("Error fetching budgets:", error);
@@ -33,24 +35,31 @@ const BudgetPage = () => {
   const handleEditBudget = (budget) => {
     setEditingBudget(budget);
     setIsDialogOpen(true);
-    setOpenMenu(null); // Close menu
+    setOpenMenu(null); 
   };
 
   const handleDeleteBudget = async (budgetId) => {
     if (window.confirm("Are you sure you want to delete this budget?")) {
       try {
-        await axios.delete(`http://localhost:5000/budget/${budgetId}`);
-        fetchBudgets(); // Refresh budget list after deletion
+        const token = localStorage.getItem("token");
+        await axios.delete(`http://localhost:5000/budget/${budgetId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        fetchBudgets(); 
       } catch (error) {
         console.error("Error deleting budget:", error);
       }
     }
-    setOpenMenu(null); // Close menu
+    setOpenMenu(null); 
   };
 
   return (
     <div className="budget-container">
       <h1 className="budget-header">My Budgets</h1>
+      <p className="budget-subtitle">
+        Manage your budgets effectively. Create, track, and monitor your expenses effortlessly.
+      </p>
+      
       <div className="budget-grid">
         <div className="create-budget-card" onClick={() => setIsDialogOpen(true)}>
           <div className="create-budget-content">
@@ -66,7 +75,11 @@ const BudgetPage = () => {
           const remainingBudget = budget.amount - totalSpent;
 
           return (
-            <div key={budget.id} className="budget-card">
+            <div 
+              key={budget.id} 
+              className="budget-card"
+              onClick={() => handleBudgetClick(budget.id)} 
+            >
               <div className="budget-header-content">
                 <span className="budget-emoji">{budget.emoji}</span>
                 <span className="budget-name">{budget.name}</span>
@@ -77,14 +90,17 @@ const BudgetPage = () => {
                   <MoreVertical
                     size={20}
                     className="action-icon"
-                    onClick={() => setOpenMenu(openMenu === budget.id ? null : budget.id)}
+                    onClick={(e) => {
+                      e.stopPropagation(); 
+                      setOpenMenu(openMenu === budget.id ? null : budget.id);
+                    }}
                   />
                   {openMenu === budget.id && (
                     <div className="action-menu">
-                      <div className="action-item" onClick={() => handleEditBudget(budget)}>
+                      <div className="action-item" onClick={(e) => { e.stopPropagation(); handleEditBudget(budget); }}>
                         <Edit size={16} /> Edit
                       </div>
-                      <div className="action-item delete" onClick={() => handleDeleteBudget(budget.id)}>
+                      <div className="action-item delete" onClick={(e) => { e.stopPropagation(); handleDeleteBudget(budget.id); }}>
                         <Trash size={16} /> Delete
                       </div>
                     </div>
@@ -92,7 +108,7 @@ const BudgetPage = () => {
                 </div>
               </div>
 
-              <div className="progress-bar-container" onClick={() => handleBudgetClick(budget.id)}>
+              <div className="progress-bar-container">
                 <div
                   className="progress-bar"
                   style={{ width: `${(totalSpent / budget.amount) * 100}%`, backgroundColor: "#1f1f1f" }}

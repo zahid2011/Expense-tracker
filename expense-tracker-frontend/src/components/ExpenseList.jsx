@@ -5,7 +5,6 @@ const ExpenseList = ({ expenses, setExpenses }) => {
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
-        // Get the logged-in user from localStorage
         const user = JSON.parse(localStorage.getItem("user"));
         const response = await axios.get(`http://localhost:5000/expenses/${user.id}`);
         setExpenses(response.data);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { SlidersHorizontal, Trash } from "lucide-react"; // Icons
+import { SlidersHorizontal, Trash } from "lucide-react";
 import "./BudgetDetailsPage.css";
 
 const BudgetDetailsPage = () => {
@@ -35,13 +35,18 @@ const BudgetDetailsPage = () => {
 
   const fetchBudgetDetails = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/budget/${id}`);
+      const token = localStorage.getItem("token"); // Get JWT token
+      const response = await axios.get(`http://localhost:5000/budget/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }, // Send token
+      });
+  
       setBudget(response.data);
       setExpenses(response.data.expenses);
     } catch (error) {
       console.error("Error fetching budget details:", error);
     }
   };
+  
 
   const handleAddExpense = async (e) => {
     e.preventDefault();
@@ -54,7 +59,8 @@ const BudgetDetailsPage = () => {
         ...formData,
         category,
         amount: parseFloat(formData.amount),
-        userId: user.id,
+      }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }, // Send token
       });
 
       fetchBudgetDetails();
@@ -77,7 +83,9 @@ const BudgetDetailsPage = () => {
 
   const confirmDeleteExpense = async () => {
     try {
-      await axios.delete(`http://localhost:5000/transactions/${expenseToDelete}`);
+      await axios.delete(`http://localhost:5000/transactions/${expenseToDelete}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }, // Send token
+      });
       setExpenseToDelete(null);
       setShowDeleteModal(false); // Close modal
       fetchBudgetDetails();
@@ -89,7 +97,10 @@ const BudgetDetailsPage = () => {
   const handleDeleteBudget = async () => {
     if (window.confirm("Are you sure you want to delete this budget?")) {
       try {
-        await axios.delete(`http://localhost:5000/budget/${id}`);
+        await axios.delete(`http://localhost:5000/budget/${id}`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }, // Send token
+        });
+        
         navigate("/budgets");
       } catch (error) {
         alert("Error deleting budget: " + error.message);

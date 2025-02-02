@@ -6,7 +6,7 @@ import Signup from "./components/Signup";
 import BudgetPage from "./components/BudgetPage";
 import ExpensesPage from "./components/ExpensesPage";
 import SettingsPage from "./components/SettingsPage";
-import IncomePage from "./components/IncomePage";
+import IncomePage from "./components/IncomePage"; 
 import ProtectedLayout from "./components/ProtectedLayout";
 import Sidebar from "./components/Sidebar";
 import BudgetDetailsPage from "./components/BudgetDetailsPage";

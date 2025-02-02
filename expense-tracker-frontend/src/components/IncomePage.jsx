@@ -10,7 +10,7 @@ const IncomePage = () => {
     source: "",
     category: "",
     amount: "",
-    date: new Date().toISOString(),
+    date: new Date().toISOString().slice(0, 16), // Ensure correct format
   });
   const [isEditing, setIsEditing] = useState(false);
   const [editingIncome, setEditingIncome] = useState(null);
@@ -19,54 +19,57 @@ const IncomePage = () => {
 
   const fetchIncomes = async () => {
     try {
-      const user = JSON.parse(localStorage.getItem("user"));
-      const response = await axios.get(`http://localhost:5000/incomes/${user.id}`);
-      
-      // Sort incomes by date (newest first)
-      const sortedIncomes = response.data.sort((a, b) => 
-        new Date(b.date) - new Date(a.date)
-      );
-      
-      setIncomes(sortedIncomes);
-  
-      const total = sortedIncomes.reduce((sum, income) => sum + income.amount, 0);
+      const token = localStorage.getItem("token");
+      const response = await axios.get("http://localhost:5000/incomes", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setIncomes(response.data);
+
+      // Calculate total income
+      const total = response.data.reduce((sum, income) => sum + income.amount, 0);
       setTotalIncome(total);
     } catch (error) {
       console.error("Error fetching incomes:", error);
     }
   };
 
+  // Add or Update Income
   const handleAddIncome = async (e) => {
     e.preventDefault();
     try {
-      const user = JSON.parse(localStorage.getItem("user"));
+      const token = localStorage.getItem("token");
       const payload = {
         ...formData,
         amount: parseFloat(formData.amount),
         date: new Date(formData.date).toISOString(),
-        userId: user.id
       };
 
       if (isEditing) {
-        await axios.put(`http://localhost:5000/incomes/${editingIncome.id}`, payload);
+        await axios.put(`http://localhost:5000/incomes/${editingIncome.id}`, payload, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setIsEditing(false);
         setEditingIncome(null);
       } else {
-        await axios.post("http://localhost:5000/incomes", payload);
+        await axios.post("http://localhost:5000/incomes", payload, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
       }
-      
+
       fetchIncomes();
-      setFormData({ 
-        source: "", 
-        category: "", 
-        amount: "", 
-        date: new Date().toISOString() 
+      setFormData({
+        source: "",
+        category: "",
+        amount: "",
+        date: new Date().toISOString().slice(0, 16),
       });
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error adding income:", error);
     }
   };
 
+  // Edit Income
   const handleEditIncome = (income) => {
     setIsEditing(true);
     setEditingIncome(income);
@@ -79,10 +82,15 @@ const IncomePage = () => {
     document.getElementById("add-income-form").scrollIntoView({ behavior: "smooth" });
   };
 
+  // Delete Income
   const handleDeleteIncome = async (id) => {
     if (window.confirm("Are you sure you want to delete this income?")) {
       try {
-        await axios.delete(`http://localhost:5000/incomes/${id}`);
+        const token = localStorage.getItem("token");
+        await axios.delete(`http://localhost:5000/incomes/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
         fetchIncomes();
       } catch (error) {
         console.error("Error deleting income:", error);
@@ -90,6 +98,7 @@ const IncomePage = () => {
     }
   };
 
+  // Filter incomes
   const filteredIncomes = filter
     ? incomes.filter((income) => income.category === filter)
     : incomes;
@@ -152,7 +161,7 @@ const IncomePage = () => {
                     day: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit',
-                    timeZone: 'UTC'
+                    timeZone: 'UTC',
                   })}
                 </td>
                 <td>{income.source}</td>
@@ -205,7 +214,7 @@ const IncomePage = () => {
           />
           <input
             type="datetime-local"
-            value={formData.date.slice(0, 16)}
+            value={formData.date}
             onChange={(e) => setFormData({ ...formData, date: e.target.value })}
             required
           />

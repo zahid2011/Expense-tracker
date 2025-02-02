@@ -1,7 +1,9 @@
 const express = require("express");
 const cors = require("cors");
 const { PrismaClient } = require("@prisma/client");
-
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+require("dotenv").config();
 const prisma = new PrismaClient();
 const app = express();
 
@@ -15,40 +17,67 @@ app.get("/", (req, res) => {
 
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
+
   try {
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user || user.password !== password) {
+
+    if (!user) {
       return res.status(401).json({ error: "Invalid email or password" });
     }
-    res.json(user); // Send user details back to the client
+
+    // Compare hashed password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: "Invalid email or password" });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN || "7d",
+    });
+
+    res.json({ token, userId: user.id, name: user.name, email: user.email });
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
 
+
 // Create a User
 app.post("/users", async (req, res) => {
   const { name, email, password } = req.body;
+
   try {
+    // Hash the password before saving
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const newUser = await prisma.user.create({
-      data: { name, email, password },
+      data: { name, email, password: hashedPassword },
     });
-    res.json(newUser);
+
+    res.json({ message: "User registered successfully!" });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ error: "Email already exists or invalid data" });
   }
 });
 
-app.get("/users/:id", async (req, res) => {
+const authenticate = require("./middlewares/authMiddleware"); // Import the middleware
+
+app.get("/users/:id", authenticate, async (req, res) => {
   const { id } = req.params;
+
+  if (parseInt(id) !== req.userId) {
+    return res.status(403).json({ error: "Unauthorized access" });
+  }
+
   try {
     const user = await prisma.user.findUnique({
       where: { id: parseInt(id) },
     });
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+
+    if (!user) return res.status(404).json({ error: "User not found" });
+
     res.json(user);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch user data" });
@@ -56,9 +85,16 @@ app.get("/users/:id", async (req, res) => {
 });
 
 
-app.put("/users/:id", async (req, res) => {
+
+app.put("/users/:id", authenticate, async (req, res) => {
   const { id } = req.params;
   const { name, email } = req.body;
+
+  // Ensure only the logged-in user can update their profile
+  if (parseInt(id) !== req.userId) {
+    return res.status(403).json({ error: "Unauthorized access" });
+  }
+
   try {
     const updatedUser = await prisma.user.update({
       where: { id: parseInt(id) },
@@ -71,20 +107,28 @@ app.put("/users/:id", async (req, res) => {
 });
 
 
-app.put("/users/:id/password", async (req, res) => {
+
+app.put("/users/:id/password", authenticate, async (req, res) => {
   const { id } = req.params;
   const { newPassword } = req.body;
 
+  if (parseInt(id) !== req.userId) {
+    return res.status(403).json({ error: "Unauthorized access" });
+  }
+
   try {
-    const updatedUser = await prisma.user.update({
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await prisma.user.update({
       where: { id: parseInt(id) },
-      data: { password: newPassword },
+      data: { password: hashedPassword },
     });
-    res.json(updatedUser);
+
+    res.json({ message: "Password updated successfully!" });
   } catch (error) {
     res.status(400).json({ error: "Failed to update password" });
   }
 });
+
 
 // Login Endpoint
 app.post("/expenses", async (req, res) => {
@@ -111,26 +155,15 @@ app.post("/expenses", async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 });
-// Create an Expense
-app.post("/expenses", async (req, res) => {
-  const { description, amount, date, category, userId } = req.body;
-  try {
-    const newExpense = await prisma.expense.create({
-      data: { description, amount, date, category, userId },
-    });
-    res.json(newExpense);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-});
 
-app.get("/expenses", async (req, res) => {
-  const { userId, budgetId, category, dateFrom, dateTo } = req.query;
+
+app.get("/expenses", authenticate, async (req, res) => {
+  const { budgetId, category, dateFrom, dateTo } = req.query;
 
   try {
     const expenses = await prisma.expense.findMany({
       where: {
-        userId: userId ? parseInt(userId) : undefined,
+        userId: req.userId, // 🔒 Ensure only the logged-in user's expenses are returned
         budgetId: budgetId ? parseInt(budgetId) : undefined,
         category: category || undefined,
         date: {
@@ -142,6 +175,7 @@ app.get("/expenses", async (req, res) => {
         budget: true,
       },
     });
+
     res.json(expenses);
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
@@ -150,24 +184,32 @@ app.get("/expenses", async (req, res) => {
 
 
 
-app.get("/expenses/:userId", async (req, res) => {
-  const { userId } = req.params; // Get userId from route params
+app.get("/expenses/:userId", authenticate, async (req, res) => {
+  const { userId } = req.params;
+
+  // Ensure the logged-in user can only see their own expenses
+  if (parseInt(userId) !== req.userId) {
+    return res.status(403).json({ error: "Unauthorized access" });
+  }
+
   try {
     const expenses = await prisma.expense.findMany({
-      where: { userId: parseInt(userId) }, // Ensure userId matches the logged-in user
+      where: { userId: req.userId }, // 🔒 Only logged-in user's expenses
     });
-    res.json(expenses); // Return the fetched expenses
+    res.json(expenses);
   } catch (error) {
     console.error("Error fetching expenses:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-app.post("/budgets", async (req, res) => {
-  const { name, amount, emoji, userId } = req.body;
 
-  if (!name || !amount || !userId) {
-    return res.status(400).json({ error: "All fields are required" });
+
+app.post("/budgets", authenticate, async (req, res) => {
+  const { name, amount, emoji } = req.body;
+
+  if (!name || !amount) {
+    return res.status(400).json({ error: "Name and amount are required" });
   }
 
   try {
@@ -176,190 +218,370 @@ app.post("/budgets", async (req, res) => {
         name,
         amount: parseFloat(amount),
         emoji: emoji || "💰", // Default emoji
-        userId: parseInt(userId),
+        userId: req.userId, // Use the logged-in user's ID
       },
     });
+
     res.json(newBudget);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Failed to create budget" });
   }
 });
+
 
 // Get Budgets for a User
-app.get("/budgets/:userId", async (req, res) => {
-  const { userId } = req.params;
-
+app.get("/budgets", authenticate, async (req, res) => {
   try {
     const budgets = await prisma.budget.findMany({
-      where: { userId: parseInt(userId) },
+      where: { userId: req.userId },
       include: { expenses: true }, // Include expenses in the response
     });
+
     res.json(budgets);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Failed to fetch budgets" });
   }
 });
 
 
-app.get("/budget/:id", async (req, res) => {
+
+app.get("/budget/:id", authenticate, async (req, res) => {
   const { id } = req.params;
+
   try {
     const budget = await prisma.budget.findUnique({
       where: { id: parseInt(id) },
-      include: { expenses: true }, // Include associated expenses
+      include: { expenses: true },
     });
+
+    if (!budget) {
+      return res.status(404).json({ error: "Budget not found" });
+    }
+
+    if (budget.userId !== req.userId) {
+      return res.status(403).json({ error: "Unauthorized access" });
+    }
+
     res.json(budget);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch budget details" });
   }
 });
 
+
 // Add an expense to a budget
-app.post("/budget/:id/expense", async (req, res) => {
+app.post("/budget/:id/expense", authenticate, async (req, res) => {
   const { id } = req.params;
-  const { description, amount, date, category, userId } = req.body;
+  const { description, amount, date, category } = req.body;
 
   try {
+    // Check if the budget exists and belongs to the user
+    const budget = await prisma.budget.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!budget) {
+      return res.status(404).json({ error: "Budget not found" });
+    }
+
+    if (budget.userId !== req.userId) {
+      return res.status(403).json({ error: "Unauthorized access" });
+    }
+
     const newExpense = await prisma.expense.create({
       data: {
         description,
         amount: parseFloat(amount),
         date: new Date(date),
         category,
-        budgetId: parseInt(id), // Link to the budget
-        userId, // Link to the user
+        budgetId: parseInt(id),
+        userId: req.userId,
       },
     });
+
     res.json(newExpense);
   } catch (error) {
     res.status(500).json({ error: "Failed to add expense" });
   }
 });
 
-app.put("/budget/:id", async (req, res) => {
+app.delete("/budget/:id", authenticate, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Check if budget exists and belongs to the user
+    const budget = await prisma.budget.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!budget) {
+      return res.status(404).json({ error: "Budget not found" });
+    }
+
+    if (budget.userId !== req.userId) {
+      return res.status(403).json({ error: "Unauthorized access" });
+    }
+
+    // Delete all expenses linked to the budget first
+    await prisma.expense.deleteMany({
+      where: { budgetId: parseInt(id) },
+    });
+
+    // Now delete the budget
+    await prisma.budget.delete({
+      where: { id: parseInt(id) },
+    });
+
+    res.json({ message: "Budget deleted successfully!" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete budget" });
+  }
+});
+
+app.put("/budget/:id/edit", authenticate, async (req, res) => {
   const { id } = req.params;
   const { name, amount, emoji } = req.body;
 
   try {
+    // Check if the budget exists and belongs to the user
+    const budget = await prisma.budget.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!budget) {
+      return res.status(404).json({ error: "Budget not found" });
+    }
+
+    if (budget.userId !== req.userId) {
+      return res.status(403).json({ error: "Unauthorized access" });
+    }
+
     const updatedBudget = await prisma.budget.update({
       where: { id: parseInt(id) },
-      data: { name, amount: parseFloat(amount), emoji },
+      data: {
+        name: name || budget.name,
+        amount: amount ? parseFloat(amount) : budget.amount,
+        emoji: emoji || budget.emoji,
+      },
     });
+
     res.json(updatedBudget);
   } catch (error) {
     res.status(500).json({ error: "Failed to update budget" });
   }
 });
 
-// Delete Budget
-app.delete("/budget/:id", async (req, res) => {
+
+app.delete("/transactions/:id", authenticate, async (req, res) => {
   const { id } = req.params;
 
   try {
-    await prisma.budget.delete({ where: { id: parseInt(id) } });
-    res.json({ message: "Budget deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to delete budget" });
-  }
-});
+    const expense = await prisma.expense.findUnique({
+      where: { id: parseInt(id) },
+    });
 
-app.delete("/transactions/:id", async (req, res) => {
-  const { id } = req.params; // Transaction ID
-  try {
+    if (!expense) {
+      return res.status(404).json({ error: "Expense not found" });
+    }
+
+    // Ensure the user can only delete their own transactions
+    if (expense.userId !== req.userId) {
+      return res.status(403).json({ error: "Unauthorized access" });
+    }
+
     await prisma.expense.delete({
       where: { id: parseInt(id) },
     });
+
     res.json({ message: "Transaction deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: "Failed to delete transaction" });
   }
 });
 
-app.post("/incomes", async (req, res) => {
-  const { source, category, amount, date, userId } = req.body;
+
+app.post("/incomes", authenticate, async (req, res) => {
+  const { source, category, amount, date } = req.body;
 
   try {
     const newIncome = await prisma.income.create({
-      data: { source, category, amount, date: new Date(date), userId: parseInt(userId) },
-    });
-    res.json(newIncome);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-});
-
-app.get("/incomes/:userId", async (req, res) => {
-  const { userId } = req.params;
-
-  try {
-    const incomes = await prisma.income.findMany({
-      where: { userId: parseInt(userId) },
-    });
-    res.json(incomes);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.get("/summary/:userId", async (req, res) => {
-  const { userId } = req.params;
-
-  try {
-    const incomes = await prisma.income.findMany({
-      where: { userId: parseInt(userId) },
-    });
-
-    const expenses = await prisma.expense.findMany({
-      where: { userId: parseInt(userId) },
-    });
-
-    const budgets = await prisma.budget.findMany({
-      where: { userId: parseInt(userId) },
-    });
-
-    const totalIncome = incomes.reduce((sum, income) => sum + income.amount, 0);
-    const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-    const totalBudget = budgets.reduce((sum, budget) => sum + budget.amount, 0);
-    const usedBudget = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-
-    const balance = totalIncome - totalExpenses;
-
-    res.json({
-      totalIncome,
-      totalExpenses,
-      balance,
-      budgetUtilization: {
-        used: usedBudget,
-        total: totalBudget,
+      data: { 
+        source, 
+        category, 
+        amount: parseFloat(amount), 
+        date: new Date(date), 
+        userId: req.userId // 🔒 Use logged-in user's ID
       },
     });
+
+    res.json(newIncome);
   } catch (error) {
-    console.error("Error fetching summary data:", error);
+    res.status(400).json({ error: "Failed to add income" });
+  }
+});
+
+
+app.get("/incomes", authenticate, async (req, res) => {
+  try {
+    const incomes = await prisma.income.findMany({
+      where: { userId: req.userId }, // 🔒 Only fetch logged-in user's incomes
+    });
+
+    res.json(incomes);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch incomes" });
+  }
+});
+
+app.put("/incomes/:id", authenticate, async (req, res) => {
+  const { id } = req.params;
+  const { source, category, amount, date } = req.body;
+
+  try {
+    const income = await prisma.income.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!income) {
+      return res.status(404).json({ error: "Income not found" });
+    }
+
+    // Ensure only the owner can update their income
+    if (income.userId !== req.userId) {
+      return res.status(403).json({ error: "Unauthorized access" });
+    }
+
+    const updatedIncome = await prisma.income.update({
+      where: { id: parseInt(id) },
+      data: { source, category, amount: parseFloat(amount), date: new Date(date) },
+    });
+
+    res.json(updatedIncome);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to update income" });
+  }
+});
+
+app.delete("/incomes/:id", authenticate, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const income = await prisma.income.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!income) {
+      return res.status(404).json({ error: "Income not found" });
+    }
+
+    // Ensure only the owner can delete their income
+    if (income.userId !== req.userId) {
+      return res.status(403).json({ error: "Unauthorized access" });
+    }
+
+    await prisma.income.delete({
+      where: { id: parseInt(id) },
+    });
+
+    res.json({ message: "Income deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete income" });
+  }
+});
+
+
+app.get("/summary", authenticate, async (req, res) => {
+  try {
+    const userId = req.userId; // 🔒 Get user ID from JWT
+
+    // Fetching aggregate totals from Prisma for efficiency
+    const totalIncome = await prisma.income.aggregate({
+      where: { userId },
+      _sum: { amount: true },
+    });
+
+    const totalExpenses = await prisma.expense.aggregate({
+      where: { userId },
+      _sum: { amount: true },
+    });
+
+    const budgets = await prisma.budget.aggregate({
+      where: { userId },
+      _sum: { amount: true },
+    });
+
+    const usedBudget = totalExpenses._sum.amount || 0;
+    const totalBudget = budgets._sum.amount || 0;
+    const balance = (totalIncome._sum.amount || 0) - usedBudget;
+
+    res.json({
+      totalIncome: totalIncome._sum.amount || 0,
+      totalExpenses: usedBudget,
+      balance,
+      budgetUtilization: { used: usedBudget, total: totalBudget },
+    });
+  } catch (error) {
     res.status(500).json({ error: "Failed to fetch summary data" });
   }
 });
 
-app.get("/chart-data/:userId", async (req, res) => {
-  const { userId } = req.params;
 
+app.get("/chart-data", authenticate, async (req, res) => {
   try {
-    const incomeData = await prisma.income.findMany({
-      where: { userId: parseInt(userId) },
+    const userId = req.userId; // 🔒 Authenticated user
+
+    // Fetch grouped income data by month and year
+    const incomeData = await prisma.income.groupBy({
+      by: ["date"],
+      where: { userId },
+      _sum: { amount: true },
+      orderBy: { date: "asc" }
     });
 
-    const expenseData = await prisma.expense.findMany({
-      where: { userId: parseInt(userId) },
+    // Fetch grouped expense data by month and year
+    const expenseData = await prisma.expense.groupBy({
+      by: ["date"],
+      where: { userId },
+      _sum: { amount: true },
+      orderBy: { date: "asc" }
     });
 
-    const labels = ["January", "February", "March", "April"]; // Replace with actual months
-    const income = labels.map((label) => calculateMonthlyTotal(incomeData, label));
-    const expenses = labels.map((label) => calculateMonthlyTotal(expenseData, label));
+    // Extract labels dynamically (YYYY-MM format to ensure correct sorting)
+    const labels = [...new Set([...incomeData, ...expenseData].map(entry =>
+      new Date(entry.date).toISOString().slice(0, 7) // Format: YYYY-MM
+    ))];
 
-    res.json({ labels, income, expenses });
+    // Sort labels chronologically
+    labels.sort();
+
+    // Map data to corresponding months
+    const income = labels.map(month =>
+      incomeData
+        .filter(entry => new Date(entry.date).toISOString().slice(0, 7) === month)
+        .reduce((sum, entry) => sum + entry._sum.amount, 0)
+    );
+
+    const expenses = labels.map(month =>
+      expenseData
+        .filter(entry => new Date(entry.date).toISOString().slice(0, 7) === month)
+        .reduce((sum, entry) => sum + entry._sum.amount, 0)
+    );
+
+    // Convert labels to readable format (e.g., "Jan 2024")
+    const formattedLabels = labels.map(label => {
+      const [year, month] = label.split("-");
+      return new Date(year, month - 1).toLocaleString("default", { month: "short", year: "numeric" });
+    });
+
+    res.json({ labels: formattedLabels, income, expenses });
+
   } catch (error) {
+    console.error("Chart Data Error:", error);
     res.status(500).json({ error: "Failed to fetch chart data" });
   }
 });
+
+
 
 const calculateMonthlyTotal = (data, month) => {
   // Calculate total for the given month
@@ -368,28 +590,25 @@ const calculateMonthlyTotal = (data, month) => {
     .reduce((sum, item) => sum + item.amount, 0);
 };
 
-app.get("/pie-chart-data/:userId", async (req, res) => {
-  const { userId } = req.params;
-
+app.get("/pie-chart-data", authenticate, async (req, res) => {
   try {
-    const expenses = await prisma.expense.findMany({
-      where: { userId: parseInt(userId) },
+    const userId = req.userId; // 🔒 Use JWT-authenticated user
+
+    const categoryTotals = await prisma.expense.groupBy({
+      by: ["category"],
+      where: { userId },
+      _sum: { amount: true },
     });
 
-    const categoryTotals = expenses.reduce((acc, expense) => {
-      acc[expense.category] = (acc[expense.category] || 0) + expense.amount;
-      return acc;
-    }, {});
-
-    const categories = Object.keys(categoryTotals);
-    const amounts = Object.values(categoryTotals);
+    const categories = categoryTotals.map((item) => item.category);
+    const amounts = categoryTotals.map((item) => item._sum.amount);
 
     res.json({ categories, amounts });
   } catch (error) {
-    console.error("Error fetching pie chart data:", error);
     res.status(500).json({ error: "Failed to fetch pie chart data" });
   }
 });
+
 // Start the server
 app.listen(5000, () => {
   console.log("Server is running on http://localhost:5000");

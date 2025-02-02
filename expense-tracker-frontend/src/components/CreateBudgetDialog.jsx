@@ -14,9 +14,9 @@ const CreateBudgetDialog = ({ onClose, fetchBudgets, editingBudget }) => {
   useEffect(() => {
     if (editingBudget) {
       setFormData({
-        name: editingBudget.name,
-        amount: editingBudget.amount,
-        emoji: editingBudget.emoji,
+        name: editingBudget.name || "",
+        amount: editingBudget.amount.toString() || "",
+        emoji: editingBudget.emoji || "💰",
       });
     }
   }, [editingBudget]);
@@ -24,21 +24,30 @@ const CreateBudgetDialog = ({ onClose, fetchBudgets, editingBudget }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const user = JSON.parse(localStorage.getItem("user"));
+      const token = localStorage.getItem("token");
 
       if (editingBudget) {
-        // Update existing budget
-        await axios.put(`http://localhost:5000/budget/${editingBudget.id}`, {
-          ...formData,
-          amount: parseFloat(formData.amount),
-        });
+        await axios.put(
+          `http://localhost:5000/budget/${editingBudget.id}/edit`,
+          {
+            ...formData,
+            amount: parseFloat(formData.amount),
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
       } else {
-        // Create new budget
-        await axios.post("http://localhost:5000/budgets", {
-          ...formData,
-          amount: parseFloat(formData.amount),
-          userId: user.id,
-        });
+        await axios.post(
+          "http://localhost:5000/budgets",
+          {
+            ...formData,
+            amount: parseFloat(formData.amount),
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
       }
 
       fetchBudgets();
