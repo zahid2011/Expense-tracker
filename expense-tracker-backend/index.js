@@ -50,8 +50,10 @@ app.post("/users", async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const profilePicture = `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=random&color=fff`;
+
     const newUser = await prisma.user.create({
-      data: { username, email, password: hashedPassword },
+      data: { username, email, password: hashedPassword, profilePicture },
     });
 
     res.json({ message: "User registered successfully!" });

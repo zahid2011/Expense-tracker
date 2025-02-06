@@ -31,28 +31,56 @@
 
 /* User Info Styles */
 .user-info {
-  background-color: black; /* Black background */
+  background-color: black; /* Keep the black background */
   color: white; /* White text */
   padding: 15px;
   border-radius: 10px; /* Rounded corners */
-  margin-bottom: 20px; /* Spacing below user info */
-  text-align: center;
+  margin-bottom: 20px;
+  display: flex; /* Use flexbox for proper alignment */
+  align-items: center; /* Align image and text in the center */
+  gap: 10px; /* Space between image and text */
 }
 
+/* Profile Picture Styling */
+.profile-pic {
+  width: 50px; /* Set image size */
+  height: 50px;
+  border-radius: 50%; /* Circular image */
+  object-fit: cover; /* Ensure image covers the area */
+  border: 2px solid white; /* White border for contrast */
+}
+
+/* Default Profile Picture (If No Image Exists) */
+.default-profile-pic {
+  width: 50px;
+  height: 45px;
+  border-radius: 50%;
+  background-color: #333; /* Dark gray for contrast */
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  font-weight: bold;
+  border: 2px solid white;
+}
+
+/* User Name */
 .user-name {
   font-size: 16px;
   font-weight: bold;
   margin: 0;
 }
 
+/* User Email */
 .user-email {
   font-size: 14px;
   margin: 0;
 }
 
-/* Navigation Links */
+
 .nav-links {
-  flex-grow: 1; /* Allow navigation links to take available space */
+  flex-grow: 1; 
 }
 
 .nav-link {

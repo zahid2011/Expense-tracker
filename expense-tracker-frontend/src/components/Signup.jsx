@@ -8,7 +8,7 @@ const Signup = () => {
     username: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
   const navigate = useNavigate();
 
@@ -20,14 +20,26 @@ const Signup = () => {
     }
 
     try {
-      await axios.post("http://localhost:5000/users", {
+      const response = await axios.post("http://localhost:5000/users", {
         username: formData.username,
-        email: formData.email,
-        password: formData.password
+        email: formData.email || null,
+        password: formData.password,
       });
 
       alert("Registration successful!");
+      
+      // Store user info in localStorage
+      localStorage.setItem("user", JSON.stringify({
+        username: response.data.username,
+        email: response.data.email || "", // Show empty if email is null
+        profilePicture: response.data.profilePicture, // Ensure backend sends this
+      }));
+
+      // Clear form after registration
+      setFormData({ username: "", email: "", password: "", confirmPassword: "" });
+
       navigate("/");
+      
     } catch (error) {
       alert("Error registering: " + (error.response?.data?.error || error.message));
     }
@@ -55,14 +67,13 @@ const Signup = () => {
           </div>
 
           <div className="auth-form-group">
-            <label className="auth-label">Email</label>
+            <label className="auth-label">Email (optional)</label>
             <input
               type="email"
               className="auth-input"
               placeholder="Enter your email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              required
             />
           </div>
 

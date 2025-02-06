@@ -5,7 +5,7 @@ import { FaChartBar, FaPiggyBank, FaFileInvoiceDollar, FaCog, FaDollarSign } fro
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || {}); // Track user state
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || {});
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -15,15 +15,12 @@ export default function Sidebar() {
 
   const isActive = (path) => location.pathname === path;
 
-  // Listen for changes in localStorage and update user info automatically
   useEffect(() => {
     const updateUser = () => {
       setUser(JSON.parse(localStorage.getItem("user")) || {});
     };
 
-    // Set up an event listener for storage changes
     window.addEventListener("storage", updateUser);
-
     return () => {
       window.removeEventListener("storage", updateUser);
     };
@@ -31,18 +28,24 @@ export default function Sidebar() {
 
   return (
     <div className="sidebar">
-      {/* Sidebar Title */}
       <h1 className="sidebar-title">Expense Tracker</h1>
 
-      {/* User Info */}
       <div className="user-info">
-        <p className="user-name">
-          <strong>Hello, {user.username || "User"}!</strong> {/* Fallback Username */}
-        </p>
-        {user.email && <p className="user-email">{user.email}</p>} {/* Show email if exists */}
+        {/* Profile Picture */}
+        {user.profilePicture ? (
+          <img src={user.profilePicture} alt="Profile" className="profile-pic" />
+        ) : (
+          <div className="default-profile-pic">{user.username?.charAt(0).toUpperCase()}</div>
+        )}
+
+        <div>
+          <p className="user-name">
+            <strong>Hello, {user.username || "User"}!</strong>
+          </p>
+          {user.email && <p className="user-email">{user.email}</p>}
+        </div>
       </div>
 
-      {/* Navigation Links */}
       <nav className="nav-links">
         <Link to="/dashboard" className={`nav-link ${isActive("/dashboard") ? "active" : ""}`}>
           <FaChartBar className="nav-icon" /> Dashboard
@@ -61,7 +64,6 @@ export default function Sidebar() {
         </Link>
       </nav>
 
-      {/* Logout Button */}
       <button className="logout-btn" onClick={handleLogout}>
         Logout
       </button>
