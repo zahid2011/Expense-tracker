@@ -8,13 +8,14 @@ datasource db {
 }
 
 model User {
-  id       Int       @id @default(autoincrement())
-  name     String
-  email    String    @unique
-  password String
-  expenses Expense[] @relation("UserExpenses") 
-  budgets  Budget[]  @relation("UserBudgets") 
-  incomes  Income[]  @relation("UserIncomes") 
+  id             Int       @id @default(autoincrement())
+  username       String    @unique  
+  email          String?   @unique  // Email is now optional
+  password       String
+  profilePicture String?   // New field: Optional Profile Picture URL
+  expenses       Expense[] @relation("UserExpenses") 
+  budgets        Budget[]  @relation("UserBudgets") 
+  incomes        Income[]  @relation("UserIncomes") 
 }
 
 model Budget {

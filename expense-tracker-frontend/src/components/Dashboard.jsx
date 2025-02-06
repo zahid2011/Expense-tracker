@@ -176,7 +176,7 @@ const Dashboard = () => {
           <p className="amount">
             {((summary.budgetUtilization.used / summary.budgetUtilization.total) * 100).toFixed(1)}%
           </p>
-          <p className="change">
+          <p className="budget-left-text">
             ${summary.budgetUtilization.used.toFixed(0)} / ${summary.budgetUtilization.total.toFixed(0)}
           </p>
         </div>

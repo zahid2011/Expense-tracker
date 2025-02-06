@@ -16,27 +16,26 @@ app.get("/", (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  const { username, password } = req.body;
 
   try {
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({ where: { username } });
 
     if (!user) {
-      return res.status(401).json({ error: "Invalid email or password" });
+      return res.status(401).json({ error: "Invalid username or password" });
     }
 
     // Compare hashed password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ error: "Invalid email or password" });
+      return res.status(401).json({ error: "Invalid username or password" });
     }
 
     // Generate JWT token
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRES_IN || "7d",
     });
-
-    res.json({ token, userId: user.id, name: user.name, email: user.email });
+    res.json({ token, userId: user.id, username: user.username, email: user.email });
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }
@@ -46,19 +45,18 @@ app.post("/login", async (req, res) => {
 
 // Create a User
 app.post("/users", async (req, res) => {
-  const { name, email, password } = req.body;
+  const { username, email, password } = req.body;
 
   try {
-    // Hash the password before saving
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await prisma.user.create({
-      data: { name, email, password: hashedPassword },
+      data: { username, email, password: hashedPassword },
     });
 
     res.json({ message: "User registered successfully!" });
   } catch (error) {
-    res.status(400).json({ error: "Email already exists or invalid data" });
+    res.status(400).json({ error: "Username or email already exists" });
   }
 });
 

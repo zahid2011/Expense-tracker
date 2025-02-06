@@ -5,7 +5,7 @@ import { Wallet } from "lucide-react";
 import "./Auth.css";
 
 const Login = () => {
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [formData, setFormData] = useState({ username: "", password: "" });
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -13,11 +13,10 @@ const Login = () => {
     try {
       const response = await axios.post("http://localhost:5000/login", formData);
 
-      // Store the token separately
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify({
         id: response.data.userId,
-        name: response.data.name,
+        username: response.data.username, 
         email: response.data.email
       }));
 
@@ -40,13 +39,13 @@ const Login = () => {
 
         <form onSubmit={handleSubmit}>
           <div className="auth-form-group">
-            <label className="auth-label">Email</label>
+            <label className="auth-label">Username</label>
             <input
-              type="email"
+              type="text"
               className="auth-input"
-              placeholder="Enter your email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              placeholder="Enter your Username"
+              value={formData.username}
+              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
               required
             />
           </div>

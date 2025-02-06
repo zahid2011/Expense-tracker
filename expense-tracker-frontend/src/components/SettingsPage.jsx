@@ -4,7 +4,7 @@ import axiosInstance from "../utils/axiosInstance";
 import "./settingspage.css";
 
 const SettingsPage = () => {
-  const [user, setUser] = useState({ fullName: "", email: "" });
+  const [user, setUser] = useState({ username: "", email: "" });
   const [password, setPassword] = useState({ newPassword: "", confirmPassword: "" });
 
   useEffect(() => {
@@ -14,7 +14,7 @@ const SettingsPage = () => {
         if (!loggedInUser) throw new Error("User not logged in");
 
         const response = await axiosInstance.get(`/users/${loggedInUser.id}`);
-        setUser({ fullName: response.data.name, email: response.data.email });
+        setUser({ username: response.data.username, email: response.data.email });
       } catch (error) {
         console.error("Failed to fetch user details:", error);
       }
@@ -37,7 +37,7 @@ const SettingsPage = () => {
     try {
       const loggedInUser = JSON.parse(localStorage.getItem("user"));
       await axiosInstance.put(`/users/${loggedInUser.id}`, {
-        name: user.fullName,
+        username: user.username,
         email: user.email,
       });
       alert("Profile updated successfully!");
@@ -98,8 +98,8 @@ const SettingsPage = () => {
         </div>
         <div className="card-content">
           <label className="block mb-4">
-            Full Name:
-            <input type="text" name="fullName" value={user.fullName} onChange={handleInputChange} className="input" />
+            Username:
+            <input type="text" name="username" value={user.username} onChange={handleInputChange} className="input" />
           </label>
           <label className="block mb-4">
             Email Address:

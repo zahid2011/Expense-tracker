@@ -67,6 +67,12 @@
   margin-left: 2rem;
 }
 
+.budget-left-text {
+  margin-left: 1 rem;
+  color: #718096;
+  display: block;
+}
+
 .charts-section {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));

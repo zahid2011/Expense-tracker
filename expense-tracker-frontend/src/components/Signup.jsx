@@ -5,7 +5,7 @@ import "./Auth.css";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
-    name: "",
+    username: "",
     email: "",
     password: "",
     confirmPassword: ""
@@ -21,7 +21,7 @@ const Signup = () => {
 
     try {
       await axios.post("http://localhost:5000/users", {
-        name: formData.name,
+        username: formData.username,
         email: formData.email,
         password: formData.password
       });
@@ -43,13 +43,13 @@ const Signup = () => {
 
         <form onSubmit={handleSubmit}>
           <div className="auth-form-group">
-            <label className="auth-label">Full Name</label>
+            <label className="auth-label">Username</label>
             <input
               type="text"
               className="auth-input"
-              placeholder="Enter your full name"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder="Choose a username"
+              value={formData.username}
+              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
               required
             />
           </div>
