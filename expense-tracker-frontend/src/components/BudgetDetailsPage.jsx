@@ -76,21 +76,24 @@ const BudgetDetailsPage = () => {
     }
   };
 
-  const handleDeleteExpense = (expenseId) => {
+  const handleDeleteExpense = async (expenseId) => {
     setExpenseToDelete(expenseId);
-    setShowDeleteModal(true); // Show confirmation modal
+    setShowDeleteModal(true);
   };
-
+  
   const confirmDeleteExpense = async () => {
+    if (!expenseToDelete) return;
+  
     try {
       await axios.delete(`http://localhost:5000/transactions/${expenseToDelete}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }, // Send token
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
+  
+      setExpenses(expenses.filter(expense => expense.id !== expenseToDelete)); 
       setExpenseToDelete(null);
-      setShowDeleteModal(false); // Close modal
-      fetchBudgetDetails();
+      setShowDeleteModal(false);
     } catch (error) {
-      alert("Error deleting transaction: " + error.message);
+      alert("Error deleting transaction: " + error.response?.data?.error || error.message);
     }
   };
 
