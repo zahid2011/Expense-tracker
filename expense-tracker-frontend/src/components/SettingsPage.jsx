@@ -7,6 +7,28 @@ const SettingsPage = () => {
   const [user, setUser] = useState({ username: "", email: "" });
   const [password, setPassword] = useState({ newPassword: "", confirmPassword: "" });
 
+  const handleSaveChanges = async () => {
+    try {
+      const loggedInUser = JSON.parse(localStorage.getItem("user"));
+      const response = await axiosInstance.put(`/users/${loggedInUser.id}`, {
+        username: user.username, 
+        email: user.email,
+      });
+  
+      // ✅ Save updated user info in localStorage
+      const updatedUser = response.data;
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+  
+      // ✅ Trigger Sidebar re-render by using an event
+      window.dispatchEvent(new Event("storage"));
+  
+      alert("Profile updated successfully!");
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+      alert("Failed to update profile.");
+    }
+  };
+  
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
@@ -33,19 +55,19 @@ const SettingsPage = () => {
     setPassword((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSaveChanges = async () => {
-    try {
-      const loggedInUser = JSON.parse(localStorage.getItem("user"));
-      await axiosInstance.put(`/users/${loggedInUser.id}`, {
-        username: user.username,
-        email: user.email,
-      });
-      alert("Profile updated successfully!");
-    } catch (error) {
-      console.error("Failed to update profile:", error);
-      alert("Failed to update profile.");
-    }
-  };
+  // const handleSaveChanges = async () => {
+  //   try {
+  //     const loggedInUser = JSON.parse(localStorage.getItem("user"));
+  //     await axiosInstance.put(`/users/${loggedInUser.id}`, {
+  //       username: user.username,
+  //       email: user.email,
+  //     });
+  //     alert("Profile updated successfully!");
+  //   } catch (error) {
+  //     console.error("Failed to update profile:", error);
+  //     alert("Failed to update profile.");
+  //   }
+  // };
 
   const handleUpdatePassword = async () => {
     if (password.newPassword !== password.confirmPassword) {
@@ -69,21 +91,26 @@ const SettingsPage = () => {
 
   const handleDeleteAccount = async () => {
     const confirmDelete = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
-    if (confirmDelete) {
-      try {
-        const loggedInUser = JSON.parse(localStorage.getItem("user"));
-        await axiosInstance.delete(`/users/${loggedInUser.id}`);
-
-        alert("Account deleted successfully!");
-        localStorage.removeItem("user");
-        localStorage.removeItem("token");
-        window.location.href = "/";
-      } catch (error) {
-        console.error("Failed to delete account:", error);
-        alert("Failed to delete account.");
-      }
+    if (!confirmDelete) return;
+  
+    try {
+      const loggedInUser = JSON.parse(localStorage.getItem("user"));
+      await axiosInstance.delete(`/users/${loggedInUser.id}`);
+  
+      alert("Account deleted successfully!");
+  
+      // ✅ Remove user from localStorage
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+  
+      // ✅ Redirect to login page
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Failed to delete account:", error);
+      alert("Failed to delete account.");
     }
   };
+  
 
   return (
     <div className="settings-container">

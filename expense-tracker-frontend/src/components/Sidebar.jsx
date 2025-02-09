@@ -14,15 +14,16 @@ export default function Sidebar() {
   };
 
   const isActive = (path) => location.pathname === path;
-
+  
   useEffect(() => {
-    const updateUser = () => {
+    const handleStorageChange = () => {
       setUser(JSON.parse(localStorage.getItem("user")) || {});
     };
-
-    window.addEventListener("storage", updateUser);
+  
+    window.addEventListener("storage", handleStorageChange);
+  
     return () => {
-      window.removeEventListener("storage", updateUser);
+      window.removeEventListener("storage", handleStorageChange);
     };
   }, []);
 

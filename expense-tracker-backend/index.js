@@ -88,7 +88,7 @@ app.get("/users/:id", authenticate, async (req, res) => {
 
 app.put("/users/:id", authenticate, async (req, res) => {
   const { id } = req.params;
-  const { name, email } = req.body;
+  const { username, email } = req.body;
 
   // Ensure only the logged-in user can update their profile
   if (parseInt(id) !== req.userId) {
@@ -98,7 +98,7 @@ app.put("/users/:id", authenticate, async (req, res) => {
   try {
     const updatedUser = await prisma.user.update({
       where: { id: parseInt(id) },
-      data: { name, email },
+      data: { username: username, email },
     });
     res.json(updatedUser);
   } catch (error) {
@@ -305,38 +305,26 @@ app.post("/budget/:id/expense", authenticate, async (req, res) => {
   }
 });
 
-app.delete("/budget/:id", authenticate, async (req, res) => {
+app.delete("/users/:id", authenticate, async (req, res) => {
   const { id } = req.params;
 
+  if (parseInt(id) !== req.userId) {
+    return res.status(403).json({ error: "Unauthorized access" });
+  }
+
   try {
-    // Check if budget exists and belongs to the user
-    const budget = await prisma.budget.findUnique({
-      where: { id: parseInt(id) },
-    });
+    await prisma.expense.deleteMany({ where: { userId: parseInt(id) } });
+    await prisma.income.deleteMany({ where: { userId: parseInt(id) } });
+    await prisma.budget.deleteMany({ where: { userId: parseInt(id) } });
+    await prisma.user.delete({ where: { id: parseInt(id) } });
 
-    if (!budget) {
-      return res.status(404).json({ error: "Budget not found" });
-    }
-
-    if (budget.userId !== req.userId) {
-      return res.status(403).json({ error: "Unauthorized access" });
-    }
-
-    // Delete all expenses linked to the budget first
-    await prisma.expense.deleteMany({
-      where: { budgetId: parseInt(id) },
-    });
-
-    // Now delete the budget
-    await prisma.budget.delete({
-      where: { id: parseInt(id) },
-    });
-
-    res.json({ message: "Budget deleted successfully!" });
+    res.json({ message: "Account and all related data deleted successfully!" });
   } catch (error) {
-    res.status(500).json({ error: "Failed to delete budget" });
+    console.error("Failed to delete account:", error);
+    res.status(500).json({ error: "Failed to delete account." });
   }
 });
+
 
 app.put("/budget/:id/edit", authenticate, async (req, res) => {
   const { id } = req.params;

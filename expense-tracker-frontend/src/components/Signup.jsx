@@ -31,11 +31,11 @@ const Signup = () => {
       // Store user info in localStorage
       localStorage.setItem("user", JSON.stringify({
         username: response.data.username,
-        email: response.data.email || "", // Show empty if email is null
-        profilePicture: response.data.profilePicture, // Ensure backend sends this
+        email: response.data.email || "", 
+        profilePicture: response.data.profilePicture, 
       }));
 
-      // Clear form after registration
+    
       setFormData({ username: "", email: "", password: "", confirmPassword: "" });
 
       navigate("/");
@@ -107,7 +107,7 @@ const Signup = () => {
 
           <p className="auth-footer-text">
             Already have an account?{" "}
-            <Link to="/login" className="auth-link">
+            <Link to="/" className="auth-link">
               Sign in
             </Link>
           </p>

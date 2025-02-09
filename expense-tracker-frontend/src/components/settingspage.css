@@ -1,33 +1,33 @@
 .settings-container {
-    padding: 20px; /* Increase padding for consistent spacing */
+    padding: 20px; 
     max-width: 850px;
-    margin: 0; /* Remove centering auto margin */
+    margin: 0; 
     font-family: Arial, sans-serif;
-    text-align: left; /* Ensure content aligns to the left */
+    text-align: left; 
   }
   
   .settings-title {
     font-size: 2rem;
     font-weight: bold;
-    margin-bottom: 16px; /* Increase space below the title */
-    text-align: left; /* Align the title to the left */
+    margin-bottom: 16px; 
+    text-align: left; 
   }
   
   .settings-description {
     font-size: 1rem;
     color: #6b7280;
-    margin-bottom: 32px; /* Increase space for better separation */
-    text-align: left; /* Align the description to the left */
+    margin-bottom: 32px; 
+    text-align: left; 
   }
   
   .card {
     background: #fff;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
-    margin-bottom: 32px; /* Increased space between cards */
+    margin-bottom: 32px; 
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.05);    
-    padding: 16px; /* Add padding inside the card for better spacing */
-    text-align: left; /* Align card content to the left */
+    padding: 16px; 
+    text-align: left; 
   }
   
   .card.danger {
@@ -35,15 +35,15 @@
   }
   
   .card-header {
-    padding-bottom: 8px; /* Reduce padding for tighter header */
+    padding-bottom: 8px; 
     border-bottom: 1px solid #e5e7eb;
-    text-align: left; /* Align the header content to the left */
+    text-align: left; 
   }
   
   .card-header h2 {
     font-size: 1.25rem;
     font-weight: bold;
-    margin: 0 0 8px; /* Increase space below header text */
+    margin: 0 0 8px;
   }
   
   .card-header p {
@@ -53,23 +53,23 @@
   }
   
   .card-content {
-    padding: 16px 16px 24px; /* More padding at the bottom for spacing */
-    text-align: left; /* Align content to the left */
+    padding: 16px 16px 24px; 
+    text-align: left; 
   }
   
   .card-footer {
     padding: 16px;
     border-top: 1px solid #e5e7eb;
-    text-align: right; /* Footer actions align to the right */
+    text-align: right; 
   }
   
   .input {
     width: 95%;
-    padding: 14px; /* Add padding for better touch targets */
+    padding: 14px; 
     border: 1px solid #d1d5db;
     border-radius: 4px;
     font-size: 1rem;
-    margin-bottom: 24px; /* Space between inputs */
+    margin-bottom: 24px; 
   }
   
   .input:focus {
@@ -88,7 +88,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    text-align: left; /* Align button text and icon left */
+    text-align: left; 
   }
   
   .button.primary {
