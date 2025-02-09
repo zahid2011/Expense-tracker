@@ -5,12 +5,20 @@
   
   .header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    justify-content: space-between; 
+    align-items: center; 
     margin-bottom: 20px;
+  }
+
+  .header-content {
+      display: flex;
+      flex-direction: column;
   }
   
   .add-income-btn {
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
     padding: 10px 20px;
     background-color: #000;
     color: #fff;
@@ -18,10 +26,18 @@
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    gap: 8px; 
+    font-size: 16px;
+    font-weight: bold;
   }
-  
+
   .add-income-btn:hover {
-    background-color: #333;
+      background-color: #333;
+  }
+
+  .add-income-btn svg {
+      width: 18px;
+      height: 18px;
   }
   
   .income-overview {
@@ -141,29 +157,46 @@
   .action-menu {
     position: relative;
     display: inline-block;
-  }
-  
-  .action-menu .dropdown {
+    background: none; 
+    border: none; 
+    box-shadow: none; 
+    padding: 0; 
+}
+
+.action-menu svg {
+    cursor: pointer;
+    padding: 5px; 
+}
+
+.action-menu .dropdown {
     position: absolute;
     right: 0;
-    top: 20px;
+    top: 25px;
     background: white;
     border: 1px solid #ddd;
     border-radius: 5px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     z-index: 1000;
-  }
-  
-  .action-menu .dropdown div {
+    min-width: 120px; 
+}
+
+.action-menu .dropdown div {
     padding: 10px;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 5px;
-  }
-  
-  .action-menu .dropdown div:hover {
+    gap: 8px;
+    background: none; 
+}
+
+.action-menu .dropdown div:hover {
     background-color: #f4f4f4;
-  }
-  
+}
+
+.subtext {
+  font-size: 1rem; 
+  color: #666;
+  margin-top: 5px;
+}
+
   

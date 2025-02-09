@@ -10,7 +10,7 @@ const IncomePage = () => {
     source: "",
     category: "",
     amount: "",
-    date: new Date().toISOString().slice(0, 16), // Ensure correct format
+    date: new Date().toISOString().slice(0, 16),
   });
   const [isEditing, setIsEditing] = useState(false);
   const [editingIncome, setEditingIncome] = useState(null);
@@ -113,8 +113,12 @@ const IncomePage = () => {
 
   return (
     <div className="income-page">
+
       <div className="header">
-        <h1>Income Management</h1>
+        <div className="header-content">
+          <h1>Income Management</h1>
+          <p className="subtext">Track and manage your income sources efficiently.</p>
+        </div>
         <button className="add-income-btn" onClick={() => document.getElementById("add-income-form").scrollIntoView({ behavior: "smooth" })}>
           <Plus size={16} /> Add Income
         </button>
@@ -123,7 +127,7 @@ const IncomePage = () => {
       <div className="income-overview">
         <div className="card">
           <h3>Total Income</h3>
-          <p>${totalIncome.toFixed(2)}</p>
+          <p>${totalIncome.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
         </div>
       </div>
 
@@ -144,7 +148,7 @@ const IncomePage = () => {
         <table>
           <thead>
             <tr>
-              <th>Date & Time</th>
+              <th>Date</th>
               <th>Source</th>
               <th>Category</th>
               <th>Amount</th>
@@ -159,9 +163,6 @@ const IncomePage = () => {
                     year: 'numeric',
                     month: 'short',
                     day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    timeZone: 'UTC',
                   })}
                 </td>
                 <td>{income.source}</td>
