@@ -15,11 +15,8 @@ const SettingsPage = () => {
         email: user.email,
       });
   
-      // ✅ Save updated user info in localStorage
       const updatedUser = response.data;
       localStorage.setItem("user", JSON.stringify(updatedUser));
-  
-      // ✅ Trigger Sidebar re-render by using an event
       window.dispatchEvent(new Event("storage"));
   
       alert("Profile updated successfully!");
@@ -55,20 +52,6 @@ const SettingsPage = () => {
     setPassword((prev) => ({ ...prev, [name]: value }));
   };
 
-  // const handleSaveChanges = async () => {
-  //   try {
-  //     const loggedInUser = JSON.parse(localStorage.getItem("user"));
-  //     await axiosInstance.put(`/users/${loggedInUser.id}`, {
-  //       username: user.username,
-  //       email: user.email,
-  //     });
-  //     alert("Profile updated successfully!");
-  //   } catch (error) {
-  //     console.error("Failed to update profile:", error);
-  //     alert("Failed to update profile.");
-  //   }
-  // };
-
   const handleUpdatePassword = async () => {
     if (password.newPassword !== password.confirmPassword) {
       alert("Passwords do not match!");
@@ -98,12 +81,8 @@ const SettingsPage = () => {
       await axiosInstance.delete(`/users/${loggedInUser.id}`);
   
       alert("Account deleted successfully!");
-  
-      // ✅ Remove user from localStorage
       localStorage.removeItem("user");
       localStorage.removeItem("token");
-  
-      // ✅ Redirect to login page
       window.location.href = "/";
     } catch (error) {
       console.error("Failed to delete account:", error);
@@ -135,7 +114,6 @@ const SettingsPage = () => {
         </div>
         <div className="card-footer">
           <button onClick={handleSaveChanges} className="button primary">
-            <Save className="icon" />
             Save Changes
           </button>
         </div>

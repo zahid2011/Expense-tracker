@@ -16,7 +16,7 @@ const BudgetDetailsPage = () => {
     category: "",
     customCategory: "",
   });
-  const [showMenu, setShowMenu] = useState(false); // Dropdown menu state
+  const [showMenu, setShowMenu] = useState(false); 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [expenseToDelete, setExpenseToDelete] = useState(null);
   const [showDeleteBudgetModal, setShowDeleteBudgetModal] = useState(false);
@@ -80,7 +80,7 @@ const BudgetDetailsPage = () => {
 
   const handleDeleteExpense = async (expenseId) => {
     const isConfirmed = window.confirm("Are you sure you want to delete this expense?");
-    if (!isConfirmed) return; // Do nothing if user cancels
+    if (!isConfirmed) return;
   
     console.log("Deleting expense with ID:", expenseId);
   
@@ -119,7 +119,7 @@ const BudgetDetailsPage = () => {
   };
 
   const handleDeleteBudget = () => {
-    setShowDeleteBudgetModal(true); // Show modal instead of window.confirm()
+    setShowDeleteBudgetModal(true); 
   };
   const confirmDeleteBudget = async () => {
     try {
@@ -127,8 +127,8 @@ const BudgetDetailsPage = () => {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
   
-      setShowDeleteBudgetModal(false); // Close modal
-      navigate("/budgets"); // Redirect after deletion
+      setShowDeleteBudgetModal(false); 
+      navigate("/budgets"); 
     } catch (error) {
       alert("Error deleting budget: " + error.message);
     }

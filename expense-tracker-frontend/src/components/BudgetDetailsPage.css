@@ -116,7 +116,7 @@
 }
 
 .transactions-card {
-    margin-top: 30px; /* Add some spacing from the top */
+    margin-top: 30px; 
     width: 100%; 
     border: none; 
     background-color: transparent; 
@@ -126,7 +126,7 @@
 
 .transactions-card h2 {
     margin-bottom: 40px;
-    font-size: 24px; /* Larger font size for the title */
+    font-size: 24px; 
 }
 
 .transaction-item {
@@ -330,19 +330,19 @@
   .add-transaction-card select {
     display: block;
     width: 100%;
-    margin-bottom: 16px; /* Space below dropdown */
-    padding: 14px; /* Add padding for better usability */
-    font-size: 16px; /* Match input font size */
+    margin-bottom: 16px; 
+    padding: 14px; 
+    font-size: 16px; 
     border: 1px solid #ccc;
-    border-radius: 6px; /* Rounded corners */
+    border-radius: 6px; 
     background-color: white;
-    box-sizing: border-box; /* Ensure padding doesn't affect width */
+    box-sizing: border-box; 
 }
 
 .add-transaction-card select:focus {
     outline: none;
-    border-color: #3b82f6; /* Blue border for focus */
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); /* Focus shadow effect */
+    border-color: #3b82f6; 
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); 
 }
 
 .add-transaction-card select option {
@@ -368,19 +368,19 @@
   
   .transaction-details h3 {
     font-size: 18px;
-    margin: 0 0 8px 0; /* Add spacing between the title and the category */
+    margin: 0 0 8px 0; 
     color: #333333;
     }
   
   .transaction-details p {
-    margin: 7px 0; /* Add spacing between text lines */
+    margin: 7px 0; 
     color: #666666;
   }
   
   .transaction-date {
     font-size: 14px;
     color: #888888;
-    margin-top: 3px; /* Add some separation from category */
+    margin-top: 3px; 
   }
   
   .transaction-actions {
