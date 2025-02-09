@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from "chart.js";
 import { Bar, Pie } from "react-chartjs-2";
-import { ArrowUp, ArrowDown, DollarSign, Wallet } from "lucide-react";
+import { ArrowUp, ArrowDown, DollarSign,  PiggyBank } from "lucide-react";
 import "./Dashboard.css";
+import { useNavigate } from "react-router-dom";
 
 ChartJS.register(
   CategoryScale,
@@ -21,7 +22,7 @@ const Dashboard = () => {
     balance: 0,
     budgetUtilization: { used: 0, total: 0 },
   });
-
+  const navigate = useNavigate();
   const [barChartData, setBarChartData] = useState({ labels: [], datasets: [] });
   const [pieChartData, setPieChartData] = useState({ labels: [], datasets: [] });
   const [transactions, setTransactions] = useState([]);
@@ -255,17 +256,17 @@ const Dashboard = () => {
 
       {/* Quick Actions */}
       <div className="navigation-buttons">
-        <div className="nav-card">
+        <div className="nav-card" onClick={() => navigate("/income")}>
           <DollarSign size={24} />
           <p>Income Page</p>
         </div>
-        <div className="nav-card">
+        <div className="nav-card" onClick={() => navigate("/expenses")}>
           <ArrowDown size={24} />
           <p>Expense Page</p>
         </div>
-        <div className="nav-card">
-            <Wallet size={24} /> 
-            <p>All Transactions</p>
+        <div className="nav-card" onClick={() => navigate("/budget")}>
+          <PiggyBank size={24} /> 
+          <p>Budget Management</p>
         </div>
       </div>
     </div>
