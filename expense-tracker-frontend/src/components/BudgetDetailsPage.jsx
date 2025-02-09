@@ -17,8 +17,10 @@ const BudgetDetailsPage = () => {
     customCategory: "",
   });
   const [showMenu, setShowMenu] = useState(false); // Dropdown menu state
-  const [showDeleteModal, setShowDeleteModal] = useState(false); // Modal state
-  const [expenseToDelete, setExpenseToDelete] = useState(null); // Expense ID to delete
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [expenseToDelete, setExpenseToDelete] = useState(null);
+  const [showDeleteBudgetModal, setShowDeleteBudgetModal] = useState(false);
+
 
   const categories = [
     "Groceries",
@@ -77,42 +79,59 @@ const BudgetDetailsPage = () => {
   };
 
   const handleDeleteExpense = async (expenseId) => {
-    setExpenseToDelete(expenseId);
-    setShowDeleteModal(true);
-  };
+    const isConfirmed = window.confirm("Are you sure you want to delete this expense?");
+    if (!isConfirmed) return; // Do nothing if user cancels
   
-  const confirmDeleteExpense = async () => {
-    if (!expenseToDelete) return;
+    console.log("Deleting expense with ID:", expenseId);
   
     try {
-      await axios.delete(`http://localhost:5000/transactions/${expenseToDelete}`, {
+      const token = localStorage.getItem("token");
+      const response = await axios.delete(`http://localhost:5000/transactions/${expenseId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      console.log("Delete response:", response.data);
+  
+      setExpenses((prevExpenses) =>
+        prevExpenses.filter((expense) => expense.id !== expenseId)
+      );
+    } catch (error) {
+      console.error("Error deleting expense:", error);
+      alert("Error deleting expense: " + (error.response?.data?.error || error.message));
+    }
+  };
+  
+  
+  const confirmDeleteExpense = async (expenseId) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`http://localhost:5000/transactions/${expenseId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      setExpenses((prevExpenses) =>
+        prevExpenses.filter((expense) => expense.id !== expenseId)
+      );
+    } catch (error) {
+      console.error("Error deleting expense:", error);
+      alert("Error deleting expense: " + (error.response?.data?.error || error.message));
+    }
+  };
+
+  const handleDeleteBudget = () => {
+    setShowDeleteBudgetModal(true); // Show modal instead of window.confirm()
+  };
+  const confirmDeleteBudget = async () => {
+    try {
+      await axios.delete(`http://localhost:5000/budget/${id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
   
-      setExpenses(expenses.filter(expense => expense.id !== expenseToDelete)); 
-      setExpenseToDelete(null);
-      setShowDeleteModal(false);
+      setShowDeleteBudgetModal(false); // Close modal
+      navigate("/budgets"); // Redirect after deletion
     } catch (error) {
-      alert("Error deleting transaction: " + error.response?.data?.error || error.message);
+      alert("Error deleting budget: " + error.message);
     }
-  };
-
-  const handleDeleteBudget = async () => {
-    if (window.confirm("Are you sure you want to delete this budget?")) {
-      try {
-        await axios.delete(`http://localhost:5000/budget/${id}`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }, // Send token
-        });
-        
-        navigate("/budgets");
-      } catch (error) {
-        alert("Error deleting budget: " + error.message);
-      }
-    }
-  };
-
-  const handleEditBudget = () => {
-    navigate(`/edit-budget/${id}`);
   };
 
   useEffect(() => {
@@ -216,7 +235,7 @@ const BudgetDetailsPage = () => {
             </div>
             ))}
         </div>
-
+            
       {/* Add Transaction Form */}
       <div id="add-transaction-form" className="add-transaction-card">
         <h2>Add Transaction</h2>
