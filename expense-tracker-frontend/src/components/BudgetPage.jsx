@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { MoreVertical, Edit, Trash } from "lucide-react";
 import CreateBudgetDialog from "./CreateBudgetDialog";
-import "./Budgetpage.css";
+import "./BudgetPage.css";
 
 const BudgetPage = () => {
   const [budgets, setBudgets] = useState([]);
