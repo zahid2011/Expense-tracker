@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import EmojiPicker from "emoji-picker-react";
-import "./createbudgetdialog.css";
+import "./CreateBudgetDialog.css";
 
 const CreateBudgetDialog = ({ onClose, fetchBudgets, editingBudget }) => {
   const [formData, setFormData] = useState({
