@@ -13,7 +13,7 @@ const ProtectedLayout = () => {
     <div className="flex min-h-screen">
       <Sidebar />
       <main className="ml-64 p-8 w-full">
-        <Outlet /> {/* This renders the nested routes */}
+        <Outlet /> 
       </main>
     </div>
   );

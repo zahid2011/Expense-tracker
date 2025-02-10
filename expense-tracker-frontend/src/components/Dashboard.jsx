@@ -234,7 +234,6 @@ const Dashboard = () => {
               <tr key={transaction.id}>
                 <td>
                     {new Date(transaction.date).toLocaleString('en-US', {
-                      timeZone: 'UTC',
                       year: 'numeric',
                       month: 'short',
                       day: 'numeric',

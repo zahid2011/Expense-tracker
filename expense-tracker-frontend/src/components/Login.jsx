@@ -62,12 +62,6 @@ const Login = () => {
             />
           </div>
 
-          <div className="password-helper">
-            <Link to="/forgot-password" className="password-helper-link">
-              Forgot your password?
-            </Link>
-          </div>
-
           <button type="submit" className="auth-button">
             Sign in
           </button>

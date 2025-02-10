@@ -24,8 +24,6 @@ app.post("/login", async (req, res) => {
     if (!user) {
       return res.status(401).json({ error: "Invalid username or password" });
     }
-
-    // Compare hashed password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ error: "Invalid username or password" });
@@ -42,8 +40,6 @@ app.post("/login", async (req, res) => {
 });
 
 
-
-// Create a User
 app.post("/users", async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -62,7 +58,7 @@ app.post("/users", async (req, res) => {
   }
 });
 
-const authenticate = require("./middlewares/authMiddleware"); // Import the middleware
+const authenticate = require("./middlewares/authMiddleware");
 
 app.get("/users/:id", authenticate, async (req, res) => {
   const { id } = req.params;
@@ -90,7 +86,6 @@ app.put("/users/:id", authenticate, async (req, res) => {
   const { id } = req.params;
   const { username, email } = req.body;
 
-  // Ensure only the logged-in user can update their profile
   if (parseInt(id) !== req.userId) {
     return res.status(403).json({ error: "Unauthorized access" });
   }
@@ -134,20 +129,18 @@ app.put("/users/:id/password", authenticate, async (req, res) => {
 app.post("/expenses", async (req, res) => {
   const { description, amount, date, category, userId } = req.body;
 
-  // Validate required fields
   if (!description || !amount || !date || !category || !userId) {
     return res.status(400).json({ error: "All fields are required" });
   }
 
-  // Convert data types
   try {
     const newExpense = await prisma.expense.create({
       data: {
         description,
-        amount: parseFloat(amount), // Ensure amount is a number
-        date: new Date(date), // Convert to Date object
+        amount: parseFloat(amount), 
+        date: new Date(date), 
         category,
-        userId: parseInt(userId) // Ensure userId is an integer
+        userId: parseInt(userId) 
       }
     });
     res.json(newExpense);
@@ -163,7 +156,7 @@ app.get("/expenses", authenticate, async (req, res) => {
   try {
     const expenses = await prisma.expense.findMany({
       where: {
-        userId: req.userId, // 🔒 Ensure only the logged-in user's expenses are returned
+        userId: req.userId,
         budgetId: budgetId ? parseInt(budgetId) : undefined,
         category: category || undefined,
         date: {
@@ -187,14 +180,13 @@ app.get("/expenses", authenticate, async (req, res) => {
 app.get("/expenses/:userId", authenticate, async (req, res) => {
   const { userId } = req.params;
 
-  // Ensure the logged-in user can only see their own expenses
   if (parseInt(userId) !== req.userId) {
     return res.status(403).json({ error: "Unauthorized access" });
   }
 
   try {
     const expenses = await prisma.expense.findMany({
-      where: { userId: req.userId }, // 🔒 Only logged-in user's expenses
+      where: { userId: req.userId },
     });
     res.json(expenses);
   } catch (error) {
@@ -217,8 +209,8 @@ app.post("/budgets", authenticate, async (req, res) => {
       data: {
         name,
         amount: parseFloat(amount),
-        emoji: emoji || "💰", // Default emoji
-        userId: req.userId, // Use the logged-in user's ID
+        emoji: emoji || "💰", 
+        userId: req.userId, 
       },
     });
 
@@ -234,7 +226,7 @@ app.get("/budgets", authenticate, async (req, res) => {
   try {
     const budgets = await prisma.budget.findMany({
       where: { userId: req.userId },
-      include: { expenses: true }, // Include expenses in the response
+      include: { expenses: true }, 
     });
 
     res.json(budgets);
@@ -269,13 +261,11 @@ app.get("/budget/:id", authenticate, async (req, res) => {
 });
 
 
-// Add an expense to a budget
 app.post("/budget/:id/expense", authenticate, async (req, res) => {
   const { id } = req.params;
   const { description, amount, date, category } = req.body;
 
   try {
-    // Check if the budget exists and belongs to the user
     const budget = await prisma.budget.findUnique({
       where: { id: parseInt(id) },
     });
@@ -331,7 +321,6 @@ app.put("/budget/:id/edit", authenticate, async (req, res) => {
   const { name, amount, emoji } = req.body;
 
   try {
-    // Check if the budget exists and belongs to the user
     const budget = await prisma.budget.findUnique({
       where: { id: parseInt(id) },
     });
@@ -371,8 +360,6 @@ app.delete("/transactions/:id", authenticate, async (req, res) => {
     if (!expense) {
       return res.status(404).json({ error: "Expense not found" });
     }
-
-    // Ensure the user can only delete their own transactions
     if (expense.userId !== req.userId) {
       return res.status(403).json({ error: "Unauthorized access" });
     }
@@ -398,7 +385,7 @@ app.post("/incomes", authenticate, async (req, res) => {
         category, 
         amount: parseFloat(amount), 
         date: new Date(date), 
-        userId: req.userId // 🔒 Use logged-in user's ID
+        userId: req.userId 
       },
     });
 
@@ -412,7 +399,7 @@ app.post("/incomes", authenticate, async (req, res) => {
 app.get("/incomes", authenticate, async (req, res) => {
   try {
     const incomes = await prisma.income.findMany({
-      where: { userId: req.userId }, // 🔒 Only fetch logged-in user's incomes
+      where: { userId: req.userId }, 
     });
 
     res.json(incomes);
@@ -434,7 +421,6 @@ app.put("/incomes/:id", authenticate, async (req, res) => {
       return res.status(404).json({ error: "Income not found" });
     }
 
-    // Ensure only the owner can update their income
     if (income.userId !== req.userId) {
       return res.status(403).json({ error: "Unauthorized access" });
     }
@@ -462,7 +448,6 @@ app.delete("/incomes/:id", authenticate, async (req, res) => {
       return res.status(404).json({ error: "Income not found" });
     }
 
-    // Ensure only the owner can delete their income
     if (income.userId !== req.userId) {
       return res.status(403).json({ error: "Unauthorized access" });
     }
@@ -480,9 +465,7 @@ app.delete("/incomes/:id", authenticate, async (req, res) => {
 
 app.get("/summary", authenticate, async (req, res) => {
   try {
-    const userId = req.userId; // 🔒 Get user ID from JWT
-
-    // Fetching aggregate totals from Prisma for efficiency
+    const userId = req.userId; 
     const totalIncome = await prisma.income.aggregate({
       where: { userId },
       _sum: { amount: true },
@@ -516,17 +499,13 @@ app.get("/summary", authenticate, async (req, res) => {
 
 app.get("/chart-data", authenticate, async (req, res) => {
   try {
-    const userId = req.userId; // 🔒 Authenticated user
-
-    // Fetch grouped income data by month and year
+    const userId = req.userId;
     const incomeData = await prisma.income.groupBy({
       by: ["date"],
       where: { userId },
       _sum: { amount: true },
       orderBy: { date: "asc" }
     });
-
-    // Fetch grouped expense data by month and year
     const expenseData = await prisma.expense.groupBy({
       by: ["date"],
       where: { userId },
@@ -534,15 +513,12 @@ app.get("/chart-data", authenticate, async (req, res) => {
       orderBy: { date: "asc" }
     });
 
-    // Extract labels dynamically (YYYY-MM format to ensure correct sorting)
     const labels = [...new Set([...incomeData, ...expenseData].map(entry =>
       new Date(entry.date).toISOString().slice(0, 7) // Format: YYYY-MM
     ))];
 
-    // Sort labels chronologically
     labels.sort();
 
-    // Map data to corresponding months
     const income = labels.map(month =>
       incomeData
         .filter(entry => new Date(entry.date).toISOString().slice(0, 7) === month)
@@ -554,8 +530,6 @@ app.get("/chart-data", authenticate, async (req, res) => {
         .filter(entry => new Date(entry.date).toISOString().slice(0, 7) === month)
         .reduce((sum, entry) => sum + entry._sum.amount, 0)
     );
-
-    // Convert labels to readable format (e.g., "Jan 2024")
     const formattedLabels = labels.map(label => {
       const [year, month] = label.split("-");
       return new Date(year, month - 1).toLocaleString("default", { month: "short", year: "numeric" });
@@ -569,10 +543,8 @@ app.get("/chart-data", authenticate, async (req, res) => {
   }
 });
 
-
-
 const calculateMonthlyTotal = (data, month) => {
-  // Calculate total for the given month
+
   return data
     .filter((item) => new Date(item.date).toLocaleString("default", { month: "long" }) === month)
     .reduce((sum, item) => sum + item.amount, 0);
@@ -580,7 +552,7 @@ const calculateMonthlyTotal = (data, month) => {
 
 app.get("/pie-chart-data", authenticate, async (req, res) => {
   try {
-    const userId = req.userId; // 🔒 Use JWT-authenticated user
+    const userId = req.userId; 
 
     const categoryTotals = await prisma.expense.groupBy({
       by: ["category"],
