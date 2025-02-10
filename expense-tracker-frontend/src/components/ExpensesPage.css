@@ -5,7 +5,6 @@
   margin: 0 auto;
 }
 
-/* Header */
 .expenses-header {
   display: flex;
   justify-content: space-between;
@@ -92,7 +91,6 @@
   font-weight: bold;
 }
 
-/* Table Row Styling */
 .expenses-table tr:nth-child(even) {
   background: #f9f9f9;
 }
