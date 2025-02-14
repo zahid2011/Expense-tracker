@@ -7,11 +7,14 @@ require("dotenv").config();
 const prisma = new PrismaClient();
 const app = express();
 
+
 app.use(cors({
-  origin: "*",  // Allow all origins (for testing; restrict it in production)
+  origin: ["https://budgethub.vercel.app", "http://localhost:5173"],
   methods: "GET,POST,PUT,DELETE,OPTIONS",
   allowedHeaders: "Content-Type,Authorization"
 }));
+
+app.options("*", cors());  // Handles preflight requests
 
 // Fix preflight issues
 app.options("*", cors());
