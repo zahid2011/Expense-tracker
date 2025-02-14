@@ -1,16 +1,30 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { FaChartBar, FaPiggyBank, FaFileInvoiceDollar, FaCog, FaDollarSign } from "react-icons/fa";
+import axios from "axios"; 
+import API_BASE_URL from "../config"; // Import API base URL
 
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || {});
 
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      // Call logout API (if your backend supports it)
+      await axios.post(`${API_BASE_URL}/logout`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      navigate("/");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      alert("Error logging out, please try again.");
+    }
   };
 
   const isActive = (path) => location.pathname === path;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { CreditCard, Download } from "lucide-react";
 import "./ExpensesPage.css";
+import API_BASE_URL from "../config";
 
 const ExpensesPage = () => {
   const [expenses, setExpenses] = useState([]);
@@ -10,7 +11,7 @@ const ExpensesPage = () => {
     const fetchExpenses = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch("http://localhost:5000/expenses", {
+        const response = await fetch(`${API_BASE_URL}/expenses`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

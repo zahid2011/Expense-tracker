@@ -195,6 +195,36 @@ app.get("/expenses/:userId", authenticate, async (req, res) => {
   }
 });
 
+app.delete("/budgets/:id", authenticate, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const budget = await prisma.budget.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!budget) {
+      return res.status(404).json({ error: "Budget not found" });
+    }
+
+    if (budget.userId !== req.userId) {
+      return res.status(403).json({ error: "Unauthorized access" });
+    }
+
+    await prisma.expense.deleteMany({
+      where: { budgetId: parseInt(id) },
+    });
+
+    await prisma.budget.delete({
+      where: { id: parseInt(id) },
+    });
+
+    res.json({ message: "Budget deleted successfully!" });
+  } catch (error) {
+    console.error("Error deleting budget:", error);
+    res.status(500).json({ error: "Failed to delete budget" });
+  }
+});
 
 
 app.post("/budgets", authenticate, async (req, res) => {
@@ -568,6 +598,11 @@ app.get("/pie-chart-data", authenticate, async (req, res) => {
     res.status(500).json({ error: "Failed to fetch pie chart data" });
   }
 });
+
+app.post("/logout", authenticate, (req, res) => {
+  res.json({ message: "Logged out successfully" });
+});
+
 
 // Start the server
 // app.listen(5000, () => {

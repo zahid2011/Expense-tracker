@@ -4,6 +4,7 @@ import axios from "axios";
 import { MoreVertical, Edit, Trash } from "lucide-react";
 import CreateBudgetDialog from "./CreateBudgetDialog";
 import "./BudgetPage.css";
+import API_BASE_URL from "../config"; 
 
 const BudgetPage = () => {
   const [budgets, setBudgets] = useState([]);
@@ -15,7 +16,7 @@ const BudgetPage = () => {
   const fetchBudgets = async () => {
     try {
       const token = localStorage.getItem("token"); 
-      const response = await axios.get("http://localhost:5000/budgets", {
+      const response = await axios.get(`${API_BASE_URL}/budgets`, {
         headers: { Authorization: `Bearer ${token}` }, 
       });
       setBudgets(response.data);
@@ -42,9 +43,9 @@ const BudgetPage = () => {
     if (window.confirm("Are you sure you want to delete this budget?")) {
       try {
         const token = localStorage.getItem("token");
-        await axios.delete(`http://localhost:5000/budget/${budgetId}`, {
+        await axios.delete(`${API_BASE_URL}/budgets/${budgetId}`, {
           headers: { Authorization: `Bearer ${token}` },
-        });
+        });        
         fetchBudgets(); 
       } catch (error) {
         console.error("Error deleting budget:", error);

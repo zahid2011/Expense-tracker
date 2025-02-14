@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import API_BASE_URL from "../config";
 
 const ExpenseForm = ({ setExpenses }) => {
   const [formData, setFormData] = useState({
@@ -12,7 +13,7 @@ const ExpenseForm = ({ setExpenses }) => {
   const fetchExpenses = async () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
-      const response = await axios.get(`http://localhost:5000/expenses/${user.id}`);
+      const response = await axios.get(`${API_BASE_URL}/expenses/${user.id}`);
       setExpenses(response.data);
     } catch (error) {
       alert("Error fetching expenses: " + error.message);
@@ -23,14 +24,13 @@ const ExpenseForm = ({ setExpenses }) => {
     e.preventDefault();
     try {
       const user = JSON.parse(localStorage.getItem("user"));
-      await axios.post("http://localhost:5000/expenses", {
+      await axios.post(`${API_BASE_URL}/expenses`, {
         ...formData,
-        amount: parseFloat(formData.amount), // Convert to number
-        userId: user.id, // Include the user ID
-        date: new Date(formData.date).toISOString() // Ensure proper date format
+        amount: parseFloat(formData.amount), 
+        userId: user.id, 
+        date: new Date(formData.date).toISOString() 
       });
       fetchExpenses();
-      // Reset form after submission
       setFormData({
         description: "",
         amount: "",

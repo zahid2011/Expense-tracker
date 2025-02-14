@@ -4,6 +4,7 @@ import { Bar, Pie } from "react-chartjs-2";
 import { ArrowUp, ArrowDown, DollarSign,  PiggyBank } from "lucide-react";
 import "./Dashboard.css";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config";
 
 ChartJS.register(
   CategoryScale,
@@ -73,11 +74,11 @@ const Dashboard = () => {
           expensesRes,
           incomesRes
         ] = await Promise.all([
-          fetch("http://localhost:5000/summary", { headers }),
-          fetch("http://localhost:5000/chart-data", { headers }),
-          fetch("http://localhost:5000/pie-chart-data", { headers }),
-          fetch("http://localhost:5000/expenses", { headers }),
-          fetch("http://localhost:5000/incomes", { headers })
+          fetch(`${API_BASE_URL}/summary`, { headers }),
+          fetch(`${API_BASE_URL}/chart-data`, { headers }),
+          fetch(`${API_BASE_URL}/pie-chart-data`, { headers }),
+          fetch(`${API_BASE_URL}/expenses`, { headers }),
+          fetch(`${API_BASE_URL}/incomes`, { headers })
         ]);
   
         // Process summary data

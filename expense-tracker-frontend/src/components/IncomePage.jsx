@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./IncomePage.css";
 import { Plus, MoreHorizontal, Edit, Trash2 } from "lucide-react";
+import API_BASE_URL from "../config";
 
 const IncomePage = () => {
   const [incomes, setIncomes] = useState([]);
@@ -20,7 +21,7 @@ const IncomePage = () => {
   const fetchIncomes = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:5000/incomes", {
+      const response = await axios.get(`${API_BASE_URL}/incomes`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -46,13 +47,13 @@ const IncomePage = () => {
       };
 
       if (isEditing) {
-        await axios.put(`http://localhost:5000/incomes/${editingIncome.id}`, payload, {
+        await axios.put(`${API_BASE_URL}/incomes/${editingIncome.id}`, payload, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setIsEditing(false);
         setEditingIncome(null);
       } else {
-        await axios.post("http://localhost:5000/incomes", payload, {
+        await axios.post(`${API_BASE_URL}/incomes`, payload, {
           headers: { Authorization: `Bearer ${token}` },
         });
       }
@@ -87,7 +88,7 @@ const IncomePage = () => {
     if (window.confirm("Are you sure you want to delete this income?")) {
       try {
         const token = localStorage.getItem("token");
-        await axios.delete(`http://localhost:5000/incomes/${id}`, {
+        await axios.delete(`${API_BASE_URL}/incomes/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

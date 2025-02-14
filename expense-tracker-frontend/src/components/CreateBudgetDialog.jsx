@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import EmojiPicker from "emoji-picker-react";
 import "./CreateBudgetDialog.css";
+import API_BASE_URL from "../config";
 
 const CreateBudgetDialog = ({ onClose, fetchBudgets, editingBudget }) => {
   const [formData, setFormData] = useState({
@@ -28,7 +29,7 @@ const CreateBudgetDialog = ({ onClose, fetchBudgets, editingBudget }) => {
 
       if (editingBudget) {
         await axios.put(
-          `http://localhost:5000/budget/${editingBudget.id}/edit`,
+          `${API_BASE_URL}/budget/${editingBudget.id}/edit`,
           {
             ...formData,
             amount: parseFloat(formData.amount),
@@ -39,7 +40,7 @@ const CreateBudgetDialog = ({ onClose, fetchBudgets, editingBudget }) => {
         );
       } else {
         await axios.post(
-          "http://localhost:5000/budgets",
+          `${API_BASE_URL}/budgets`,
           {
             ...formData,
             amount: parseFloat(formData.amount),

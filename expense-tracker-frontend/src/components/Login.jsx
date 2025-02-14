@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { Wallet } from "lucide-react";
 import "./Auth.css";
-
+import API_BASE_URL from "../config";
 const Login = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const navigate = useNavigate();
@@ -11,7 +11,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:5000/login", formData);
+      const response =  await axios.post(`${API_BASE_URL}/login`, formData);
 
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify({

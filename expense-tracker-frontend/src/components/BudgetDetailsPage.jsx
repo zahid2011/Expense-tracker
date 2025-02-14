@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { SlidersHorizontal, Trash } from "lucide-react";
 import "./BudgetDetailsPage.css";
+import API_BASE_URL from "../config";
 
 const BudgetDetailsPage = () => {
   const { id } = useParams();
@@ -38,7 +39,7 @@ const BudgetDetailsPage = () => {
   const fetchBudgetDetails = async () => {
     try {
       const token = localStorage.getItem("token"); // Get JWT token
-      const response = await axios.get(`http://localhost:5000/budget/${id}`, {
+      const response = await axios.get(`${API_BASE_URL}/budget/${id}`, {
         headers: { Authorization: `Bearer ${token}` }, // Send token
       });
   
@@ -57,7 +58,7 @@ const BudgetDetailsPage = () => {
       const category =
         formData.category === "Other" ? formData.customCategory : formData.category;
 
-      await axios.post(`http://localhost:5000/budget/${budget.id}/expense`, {
+      await axios.post(`${API_BASE_URL}/budget/${budget.id}/expense`, {
         ...formData,
         category,
         amount: parseFloat(formData.amount),
@@ -86,7 +87,7 @@ const BudgetDetailsPage = () => {
   
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.delete(`http://localhost:5000/transactions/${expenseId}`, {
+      const response = await axios.delete(`${API_BASE_URL}/transactions/${expenseId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
   
