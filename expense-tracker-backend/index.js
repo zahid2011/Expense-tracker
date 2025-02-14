@@ -7,7 +7,15 @@ require("dotenv").config();
 const prisma = new PrismaClient();
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: "*",  // Allow all origins (for testing; restrict it in production)
+  methods: "GET,POST,PUT,DELETE,OPTIONS",
+  allowedHeaders: "Content-Type,Authorization"
+}));
+
+// Fix preflight issues
+app.options("*", cors());
+
 app.use(express.json());
 
 // Test API
