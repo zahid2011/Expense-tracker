@@ -10,7 +10,7 @@ datasource db {
 model User {
   id             Int       @id @default(autoincrement())
   username       String    @unique  
-  email          String?   @unique  // Email is now optional
+  email          String?   // Email is now optional
   password       String
   profilePicture String?   // New field: Optional Profile Picture URL
   expenses       Expense[] @relation("UserExpenses") 

@@ -65,6 +65,7 @@ app.post("/users", async (req, res) => {
 
     res.json({ message: "User registered successfully!" });
   } catch (error) {
+    console.error(error); 
     res.status(400).json({ error: "Username or email already exists" });
   }
 });
