@@ -35,7 +35,7 @@ const Login = () => {
   const handleGuestLogin = async () => {
     try {
       const response = await axios.post(`${API_BASE_URL}/guest-login`);
-  
+
       localStorage.setItem("token", response.data.token);
       localStorage.setItem(
         "user",
@@ -46,12 +46,20 @@ const Login = () => {
           isGuest: true,
         })
       );
-  
+
       navigate("/dashboard");
     } catch (error) {
-      alert("Error logging in as guest: " + error.message);
+      // Debug info:
+      console.error("Guest login error:", error);
+      if (error.response) {
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
+        console.error("Error response headers:", error.response.headers);
+      }
+      alert("Error logging in as guest: " + (error.response?.data?.error || error.message));
     }
   };
+
   
 
   return (
