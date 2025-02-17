@@ -4,27 +4,55 @@ import { useNavigate, Link } from "react-router-dom";
 import { Wallet } from "lucide-react";
 import "./Auth.css";
 import API_BASE_URL from "../config";
+
 const Login = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const navigate = useNavigate();
 
+  // Regular Login
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response =  await axios.post(`${API_BASE_URL}/login`, formData);
+      const response = await axios.post(`${API_BASE_URL}/login`, formData);
 
       localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", JSON.stringify({
-        id: response.data.userId,
-        username: response.data.username, 
-        email: response.data.email
-      }));
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          id: response.data.userId,
+          username: response.data.username,
+          email: response.data.email,
+        })
+      );
 
       navigate("/dashboard");
     } catch (error) {
       alert("Error logging in: " + (error.response?.data?.error || error.message));
     }
   };
+
+  // Guest Login
+  const handleGuestLogin = async () => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/guest-login`);
+  
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          id: response.data.userId,
+          username: response.data.username,
+          email: `${response.data.username.toLowerCase()}@guest.com`,
+          isGuest: true,
+        })
+      );
+  
+      navigate("/dashboard");
+    } catch (error) {
+      alert("Error logging in as guest: " + error.message);
+    }
+  };
+  
 
   return (
     <div className="auth-container">
@@ -64,6 +92,10 @@ const Login = () => {
 
           <button type="submit" className="auth-button">
             Sign in
+          </button>
+
+          <button type="button" className="guest-btn" onClick={handleGuestLogin}>
+            Sign in as Guest
           </button>
 
           <p className="auth-footer-text">

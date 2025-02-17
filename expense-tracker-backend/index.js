@@ -615,6 +615,56 @@ app.post("/logout", authenticate, (req, res) => {
   res.json({ message: "Logged out successfully" });
 });
 
+app.post("/guest-login", async (req, res) => {
+  try {
+    const guestUsername = `Guest_${Math.floor(1000 + Math.random() * 9000)}`;
+    
+    const guestUser = await prisma.user.create({
+      data: {
+        username: guestUsername,
+        email: null, // No email for guests
+        password: "", // No password required
+        profilePicture: `https://ui-avatars.com/api/?name=${guestUsername}&background=random&color=fff`,
+        isGuest: true, //
+      },
+    });
+
+    const token = jwt.sign({ userId: guestUser.id, isGuest: true }, process.env.JWT_SECRET, {
+      expiresIn: "1h", // Guest expires after 1 hour
+    });
+
+    res.json({ token, userId: guestUser.id, username: guestUser.username });
+  } catch (error) {
+    console.error("Guest login failed:", error);
+    res.status(500).json({ error: "Failed to create guest account" });
+  }
+});
+
+
+app.delete("/logout", authenticate, async (req, res) => {
+  try {
+    const userId = req.userId;
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+
+    if (user && user.isGuest) {
+      // Deleting guest user's data (expenses, budgets, incomes)
+      await prisma.expense.deleteMany({ where: { userId } });
+      await prisma.budget.deleteMany({ where: { userId } });
+      await prisma.income.deleteMany({ where: { userId } });
+
+      // Deleting the guest user account
+      await prisma.user.delete({ where: { id: userId } });
+
+      return res.json({ message: "Guest session ended. Data deleted." });
+    }
+
+    res.json({ message: "Logged out successfully." });
+  } catch (error) {
+    console.error("Logout error:", error);
+    res.status(500).json({ error: "Failed to log out" });
+  }
+});
+
 
 // Start the server
 // app.listen(5000, () => {

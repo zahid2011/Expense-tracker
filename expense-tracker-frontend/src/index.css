@@ -4,16 +4,17 @@
   position: fixed;
   top: 0;
   left: 0;
-  background-color: white; 
-  color: #1f2937; 
+  background-color: white;
+  color: #1f2937;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; 
+  justify-content: space-between;
   padding: 20px;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); 
-  border-right: 2px solid black; 
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  border-right: 2px solid black;
   box-sizing: border-box;
-  font-family: Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
 }
 
 /* Sidebar Title */
@@ -22,60 +23,70 @@
   font-weight: bold;
   color: black;
   margin-bottom: 20px;
-  text-align: center; 
-  white-space: nowrap; 
+  text-align: center;
+  white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis; 
+  text-overflow: ellipsis;
 }
 
 .user-info {
   background-color: black;
-  color: white; 
-  padding: 15px;
-  border-radius: 10px; 
-  margin-bottom: 20px;
-  display: flex; 
-  align-items: center; 
-  gap: 10px; 
-}
-
-.profile-pic {
-  width: 50px; 
-  height: 50px;
-  border-radius: 50%; 
-  object-fit: cover; 
-  border: 2px solid white; 
-}
-
-.default-profile-pic {
-  width: 48px;
-  height: 45px;
-  border-radius: 50%;
-  background-color: #333; 
   color: white;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  flex: 1;       
+  min-width: 0;  
+}
+
+.profile-pic,
+.default-profile-pic {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover; 
+  border: 2px solid white;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 20px;
   font-weight: bold;
-  border: 2px solid white;
+  background-color: #333; 
+  color: white;           
 }
 
-/* User Name */
+/* Name & Email text, with truncation for large text */
 .user-name {
   font-size: 16px;
   font-weight: bold;
   margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
 }
 
 .user-email {
   font-size: 14px;
   margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px; 
 }
 
-
+/* Nav & logout styles */
 .nav-links {
-  flex-grow: 1; 
+  flex-grow: 1;
 }
 
 .nav-link {
@@ -91,8 +102,8 @@
 }
 
 .nav-link:hover {
-  background-color: black; 
-  color: white; 
+  background-color: black;
+  color: white;
 }
 
 .nav-icon {
@@ -101,8 +112,8 @@
 }
 
 .logout-btn {
-  background-color: black; 
-  color: white; 
+  background-color: black;
+  color: white;
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
@@ -114,25 +125,44 @@
 }
 
 .logout-btn:hover {
-  background-color: #000000; 
+  background-color: #000000;
 }
 
 .nav-link.active {
-  background-color: black; 
-  color: white; 
-  font-weight: bold; 
-  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5); 
+  background-color: black;
+  color: white;
+  font-weight: bold;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
 }
 
 .nav-link.active:hover {
-  background-color: #1a1a1a; 
+  background-color: #1a1a1a;
 }
 
 .main-content {
-  margin-left: 250px; 
-  padding: 10px 20px; 
+  margin-left: 250px;
+  padding: 10px 20px;
   min-height: 100vh;
   background-color: #f8f9fa;
-  font-family: Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
 }
 
+.guest-banner {
+  background-color: #fffbea; /* a pale yellow background */
+  border: 1px solid #fcd34d; /* a light golden border */
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+  color: #b45309; /* a darker golden text */
+  font-size: 14px;
+}
+
+.guest-banner-title {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.guest-banner-subtitle {
+  margin: 0;
+}

@@ -2,7 +2,7 @@
     padding: 20px; 
     max-width: 850px;
     margin: 0; 
-    font-family: Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     text-align: left; 
   }
   
@@ -108,6 +108,15 @@
   .button.danger:hover {
     background: #ef4444;
   }
-  
+
+  .guest-warning {
+    background-color: #FFFBEB;  
+    color: #92400E;            
+    border: 1px solid #FBBF24; 
+    border-radius: 4px;
+    padding: 12px;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+  }
   
       

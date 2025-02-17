@@ -16,6 +16,7 @@ model User {
   expenses       Expense[] @relation("UserExpenses") 
   budgets        Budget[]  @relation("UserBudgets") 
   incomes        Income[]  @relation("UserIncomes") 
+  isGuest        Boolean   @default(false)
 }
 
 model Budget {

@@ -7,8 +7,9 @@ import "./settingspage.css";
 
 const SettingsPage = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState({ username: "", email: "" });
+  const [user, setUser] = useState({ username: "", email: "", isGuest: false });
   const [password, setPassword] = useState({ newPassword: "", confirmPassword: "" });
+  const [isGuest, setIsGuest] = useState(false);
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -23,7 +24,16 @@ const SettingsPage = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        setUser({ username: response.data.username, email: response.data.email });
+        // If user is a guest, show a "guest" style email like "Guest_XXXX@guest.com"
+        setUser({
+          username: response.data.username,
+          email: response.data.isGuest
+            ? `${response.data.username.toLowerCase()}@guest.com`
+            : response.data.email,
+          isGuest: response.data.isGuest,
+        });
+
+        setIsGuest(response.data.isGuest);
       } catch (error) {
         console.error("Failed to fetch user details:", error);
       }
@@ -43,6 +53,9 @@ const SettingsPage = () => {
   };
 
   const handleSaveChanges = async () => {
+    // Prevent updates if user is guest
+    if (isGuest) return;
+
     try {
       const loggedInUser = JSON.parse(localStorage.getItem("user"));
       const token = localStorage.getItem("token");
@@ -65,6 +78,9 @@ const SettingsPage = () => {
   };
 
   const handleUpdatePassword = async () => {
+    // Prevent updates if user is guest
+    if (isGuest) return;
+
     if (password.newPassword !== password.confirmPassword) {
       alert("Passwords do not match!");
       return;
@@ -89,6 +105,9 @@ const SettingsPage = () => {
   };
 
   const handleDeleteAccount = async () => {
+    // Prevent deletion if user is guest
+    if (isGuest) return;
+
     const confirmDelete = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
     if (!confirmDelete) return;
 
@@ -117,6 +136,13 @@ const SettingsPage = () => {
       <h1 className="settings-title">Settings</h1>
       <p className="settings-description">Manage your account settings and preferences.</p>
 
+      {/* Guest Warning */}
+      {isGuest && (
+        <div className="guest-warning">
+          You are logged in as a guest and cannot make changes.
+        </div>
+      )}
+
       {/* Profile Settings */}
       <div className="card">
         <div className="card-header">
@@ -126,15 +152,33 @@ const SettingsPage = () => {
         <div className="card-content">
           <label className="block mb-4">
             Username:
-            <input type="text" name="username" value={user.username} onChange={handleInputChange} className="input" />
+            <input
+              type="text"
+              name="username"
+              value={user.username}
+              onChange={handleInputChange}
+              className="input"
+              disabled={isGuest}
+            />
           </label>
           <label className="block mb-4">
             Email Address:
-            <input type="email" name="email" value={user.email} onChange={handleInputChange} className="input" />
+            <input
+              type="email"
+              name="email"
+              value={user.email}
+              onChange={handleInputChange}
+              className="input"
+              disabled={isGuest}
+            />
           </label>
         </div>
         <div className="card-footer">
-          <button onClick={handleSaveChanges} className="button primary">
+          <button
+            onClick={handleSaveChanges}
+            className={`button primary ${isGuest ? "disabled" : ""}`}
+            disabled={isGuest}
+          >
             <Save className="icon" /> Save Changes
           </button>
         </div>
@@ -149,15 +193,33 @@ const SettingsPage = () => {
         <div className="card-content">
           <label className="block mb-4">
             New Password:
-            <input type="password" name="newPassword" value={password.newPassword} onChange={handlePasswordChange} className="input" />
+            <input
+              type="password"
+              name="newPassword"
+              value={password.newPassword}
+              onChange={handlePasswordChange}
+              className="input"
+              disabled={isGuest}
+            />
           </label>
           <label className="block mb-4">
             Confirm New Password:
-            <input type="password" name="confirmPassword" value={password.confirmPassword} onChange={handlePasswordChange} className="input" />
+            <input
+              type="password"
+              name="confirmPassword"
+              value={password.confirmPassword}
+              onChange={handlePasswordChange}
+              className="input"
+              disabled={isGuest}
+            />
           </label>
         </div>
         <div className="card-footer">
-          <button onClick={handleUpdatePassword} className="button primary">
+          <button
+            onClick={handleUpdatePassword}
+            className={`button primary ${isGuest ? "disabled" : ""}`}
+            disabled={isGuest}
+          >
             Update Password
           </button>
         </div>
@@ -170,7 +232,11 @@ const SettingsPage = () => {
           <p>Manage your account data and preferences.</p>
         </div>
         <div className="card-footer">
-          <button onClick={handleDeleteAccount} className="button danger">
+          <button
+            onClick={handleDeleteAccount}
+            className={`button danger ${isGuest ? "disabled" : ""}`}
+            disabled={isGuest}
+          >
             <Trash2 className="icon" /> Delete Account
           </button>
         </div>
