@@ -4,9 +4,16 @@ const { PrismaClient } = require("@prisma/client");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 require("dotenv").config();
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 const app = express();
 
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL,
+    },
+  },
+});
 
 app.use(cors({
   origin: ["https://budgethub.vercel.app", "http://localhost:5173"],
@@ -670,8 +677,16 @@ app.delete("/logout", authenticate, async (req, res) => {
 // app.listen(5000, () => {
 //   console.log("Server is running on http://localhost:5000");
 // });
-const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== "test") {  
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
+
+module.exports = app;
+
+// app.listen(PORT, '0.0.0.0', () => {
+//   console.log(`Server is running on port ${PORT}`);
+// });
